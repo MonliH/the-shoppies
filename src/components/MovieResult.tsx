@@ -5,7 +5,7 @@ import styled from "styled-components";
 import { Movie } from "lib/movieModel";
 
 import { VerticalWrapper, HorizontalWrapper } from "components/Wrappers";
-import { SmallHeading } from "components/Text";
+import { SmallHeading, NormalText } from "components/Text";
 import { StyledPadding } from "components/Widget";
 
 import useWindowDimensions from "hooks/useWindowDimensions";
@@ -32,7 +32,9 @@ const MovieFallback = styled(MovieImage).attrs({ as: "div" })`
   align-items: center;
   justify-content: center;
   flex-direction: column;
-  background-color: #EFEFEF;
+  background-color: #efefef;
+  min-width: 60px;
+  min-height: 95px;
 `;
 
 const MoviePadding = styled(StyledPadding)`
@@ -41,11 +43,13 @@ const MoviePadding = styled(StyledPadding)`
   padding: 15px !important;
   display: flex;
   align-items: center;
+  margin: 0;
 `;
 
 const SearchResultsWrapper = styled(animated.div)`
   position: relative;
   margin-top: 20px;
+  flex-shrink: 0 !important;
 `;
 
 const MovieHW = styled(HorizontalWrapper)`
@@ -54,6 +58,17 @@ const MovieHW = styled(HorizontalWrapper)`
 
 const MovieVW = styled(VerticalWrapper)`
   margin-left: 10px;
+`;
+
+const DateText = styled(NormalText)`
+  margin: 0;
+  font-size: 15px;
+`;
+
+const MovieHeading = styled(SmallHeading)`
+  margin: 0;
+  margin-bottom: 3px;
+  font-size: 17px;
 `;
 
 const MovieImageFallback = ({ title }: { title: string }) => (
@@ -68,8 +83,7 @@ const MovieImageFallback = ({ title }: { title: string }) => (
           .join("")
       }
     </SmallHeading>
-    <br/>
-    <img alt="No Image" src="/no-image.svg" width={20} height={20}/>
+    <img alt="No Poster" src="/no-image.svg" width={20} height={20} />
   </MovieFallback>
 );
 
@@ -90,7 +104,12 @@ const MovieCard = ({ movie }: { movie: Movie }) => {
           />
         )}
         <MovieVW>
-          <SmallHeading>{movie.title}</SmallHeading>
+          <MovieHeading>
+            {movie.title.length > 50
+              ? `${movie.title.slice(0, 30)}...`
+              : movie.title}
+          </MovieHeading>
+          <DateText>Released in {movie.releaseYear}</DateText>
         </MovieVW>
       </MovieHW>
     </MoviePadding>
@@ -103,17 +122,22 @@ interface MoviePosition {
 }
 
 const MovieResults = ({ movies }: { movies: Array<Movie> }) => {
-  // With next.js, we don't want to pre-render any of this
   const dims = useWindowDimensions();
-  // Calculate on client side
-  const width = dims.width * 0.7;
+  // Use 60% of screen
+  const width = dims.width * 0.6;
 
   // Approximate the number of comlumns (without margin)
   const approxCols = Math.floor(width / cardw) || 1;
 
   // Account for margin after approximating number of columns
-  const columns =
+  let columns =
     approxCols !== 1 ? Math.floor((width - cardwm * approxCols) / cardw) : 1;
+
+  // Make sure movies.length is not 0
+  if (movies.length && movies.length < columns) {
+    // We want to center them, otherwise it looks weird
+    columns = movies.length;
+  }
 
   let counterCol = 0;
   let counterRow = 0;
@@ -159,7 +183,9 @@ const MovieResults = ({ movies }: { movies: Array<Movie> }) => {
       height: cardh,
       opacity: 1,
     }),
-    leave: { height: 0, opacity: 0 },
+    // If we don't do the `as any` cast here, this bug shows up:
+    // https://github.com/pmndrs/react-spring/issues/1060
+    leave: ({ xy }) => ({ xy: [xy[0], 0] as any, height: 0, opacity: 0 }),
     keys: (item: MoviePosition) => item.movie.id,
   });
 
@@ -176,7 +202,7 @@ const MovieResults = ({ movies }: { movies: Array<Movie> }) => {
             ),
             ...others,
           } as any
-          // The `as any` is required because of a bug in react-spring.
+          // The `as any` cast is required because of a bug in react-spring.
           // See this https://github.com/react-spring/react-spring/issues/1102
         }
       >
@@ -186,8 +212,12 @@ const MovieResults = ({ movies }: { movies: Array<Movie> }) => {
   });
 
   const wrapperStyles = useSpring({
-    height: (counterRow - 1) * (cardh + cardhm),
+    // Calculate height
+    // First, get number of rows then multiply by total height of one card
+    // Also, if the number of movies is zero, we want zero
+    height: Math.ceil(movies.length ? movies.length / columns : 0) * (cardh + cardhm),
     width: columns * (cardw + cardwm),
+    config: { mass: 2, tension: 100, friction: 30 },
   });
 
   return (

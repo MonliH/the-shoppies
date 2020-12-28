@@ -13,8 +13,11 @@ const useSearch = (): [
   const [results, set_results] = useState<Result<Array<Movie>>>([]);
   useEffect(() => {
     (async () => {
-      if (query) {
+      if (query && query !== "") {
         set_results(await searchMovies(query));
+      } else {
+        // Empty query
+        set_results([]);
       }
     })();
   }, [query]);

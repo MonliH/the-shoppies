@@ -20,6 +20,12 @@ const SearchBarInput = styled.input`
 
   padding: 9px;
   margin-top: 5px;
+
+  &:focus {
+    outline: 0;
+    /* Fake the outline, becuase outline can't provide rounded corners */
+    box-shadow: 0 0 0 1px #3D73FF;
+  }
 `;
 
 const SearchBar = ({

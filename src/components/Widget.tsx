@@ -7,4 +7,5 @@ export const StyledPadding = styled.div`
   background-color: ${props => props.theme.backgroundOne};
   border-radius: 5px;
   box-shadow: 5px 5px 7px 1px #F2F2F2;
+  margin-bottom: 15px;
 `;
