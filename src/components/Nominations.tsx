@@ -1,5 +1,6 @@
 import React from "react";
 import styled from "styled-components";
+import { useSpring, animated } from "react-spring";
 
 import { Movie } from "lib/movieModel";
 
@@ -21,9 +22,11 @@ interface NominationsProps extends MovieInteraction {
 
 const NominationsDiv = styled(AnimatedStyledPadding)`
   background-color: #f0f0f0;
-  width: ${cardDimensions.width + 40}px;
+  width: 0px;
   z-index: 5;
   margin-top: 20px;
+  /* Hide because we're animating width */
+  overflow: hidden;
 `;
 
 const HelpText = styled(NormalText)`
@@ -47,8 +50,19 @@ const Nominations = ({
   movieOnClick,
   removeOnClick,
 }: NominationsProps) => {
+  // This technically is O(n), but we only have max 5 elements,
+  // so it's cheaper than keeping a seperate counter that might cause rerenders.
+  const length = Object.keys(nominations).length;
+
+  // Make the element invisible if there are no nominations
+  const style = useSpring({
+    opacity: length ? 1 : 0,
+    height: length * cardDimensions.height + (length ? 90 : 0),
+    // Add 40 for padding
+    width: length ? cardDimensions.width + 40 : 0,
+  });
   return (
-    <NominationsDiv>
+    <NominationsDiv style={style as any}>
       <Label>Nominated Movies</Label>
       <HelpText>Drag Movies to Rearrange</HelpText>
       {Object.keys(nominations).map((movieId) => {

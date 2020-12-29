@@ -146,7 +146,11 @@ const MovieResults = ({
     height:
       Math.ceil(movies.length ? movies.length / columns : 0) *
       (cardDimensions.height + cardDimensions.TBMargin),
-    width: columns * (cardDimensions.width + cardDimensions.LRMargin),
+
+    // Make the width 0 with no results
+    width: movies.length
+      ? columns * (cardDimensions.width + cardDimensions.LRMargin)
+      : 0,
     config: { mass: 2, tension: 100, friction: 30 },
   });
 
