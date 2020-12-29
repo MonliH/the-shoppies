@@ -25,6 +25,7 @@ interface MovieResultsProps extends MovieInteraction {
   movies: Array<Movie>;
   movieOnNominate: (movie: Movie) => void;
   nominated: NominationsStore;
+  nominatedDisabled: boolean;
 }
 
 const MovieResults = ({
@@ -32,6 +33,7 @@ const MovieResults = ({
   movieOnClick,
   movieOnNominate,
   nominated,
+  nominatedDisabled,
 }: MovieResultsProps) => {
   const dims = useWindowDimensions();
   // Use 60% of screen
@@ -107,7 +109,9 @@ const MovieResults = ({
 
   const fragment = transitions((style, item: MoviePosition) => {
     let { xy, ...others } = style;
-    const alreadyNominated = nominated.hasOwnProperty(item.movie.id);
+    const alreadyNominated = nominated.nominations.hasOwnProperty(
+      item.movie.id
+    );
 
     return (
       <animated.div
@@ -129,8 +133,15 @@ const MovieResults = ({
             onClick={() => {
               movieOnNominate(item.movie);
             }}
-            disabled={alreadyNominated}
-            style={{ cursor: alreadyNominated ? "not-allowed" : "default" }}
+            // Disabled if it's already been nominated, or if everything is disabled
+            // becuase there are over 5 nominations
+            disabled={alreadyNominated || nominatedDisabled}
+            style={{
+              cursor:
+                alreadyNominated || nominatedDisabled
+                  ? "not-allowed"
+                  : "default",
+            }}
           >
             {alreadyNominated ? "Nominated" : "Nominate"}
           </Button>

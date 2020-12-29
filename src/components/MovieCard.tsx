@@ -1,6 +1,7 @@
 import React, { useState, ReactNode } from "react";
 import { useSpring } from "react-spring";
 import styled from "styled-components";
+import { CameraOff } from "react-feather";
 
 import { VerticalWrapper, HorizontalWrapper } from "components/Wrappers";
 import { SmallHeading, NormalText } from "components/Text";
@@ -78,7 +79,7 @@ const MovieImageFallback = ({ title }: { title: string }) => (
           .join("")
       }
     </SmallHeading>
-    <img alt="No Poster" src="/no-image.svg" width={20} height={20} />
+    <CameraOff size={20} />
   </MovieFallback>
 );
 

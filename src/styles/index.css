@@ -15,6 +15,7 @@ main,
   min-height: 100vh;
   width: fit-content;
   height: fit-content;
+  overflow-x: hidden;
 }
 
 /* Remove X on ie and chrome in search bar; we'll add our own */

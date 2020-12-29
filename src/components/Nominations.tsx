@@ -1,6 +1,7 @@
 import React from "react";
 import styled from "styled-components";
 import { useSpring, animated } from "react-spring";
+import { X } from "react-feather";
 
 import { Movie } from "lib/movieModel";
 
@@ -8,11 +9,16 @@ import MovieCard, {
   cardDimensions,
   MovieInteraction,
 } from "components/MovieCard";
-import { Button, AnimatedStyledPadding } from "components/Widget";
-import { Label, NormalText, fontSans } from "components/Text";
+import { Button, AnimatedStyledPadding, RemoveButton } from "components/Widget";
+import { Label, NormalText } from "components/Text";
+
+interface NominationsKV {
+  [key: string]: Movie;
+}
 
 export interface NominationsStore {
-  [key: string]: Movie;
+  nominations: NominationsKV;
+  len: number;
 }
 
 interface NominationsProps extends MovieInteraction {
@@ -33,38 +39,13 @@ const HelpText = styled(NormalText)`
   font-size: 14px;
 `;
 
-const RemoveButton = styled.button`
-  font: 25px ${fontSans};
-  border: none;
-  background-color: white;
-  background-color: rgba(0, 0, 0, 0);
-  position: absolute;
-  top: 0;
-  right: 0;
-  margin-top: 7px;
-  margin-right: 7px;
-`;
-
-const Nominations = ({
-  nominations,
-  movieOnClick,
+const NominationsCards = ({
+  nominations: { nominations },
   removeOnClick,
+  movieOnClick,
 }: NominationsProps) => {
-  // This technically is O(n), but we only have max 5 elements,
-  // so it's cheaper than keeping a seperate counter that might cause rerenders.
-  const length = Object.keys(nominations).length;
-
-  // Make the element invisible if there are no nominations
-  const style = useSpring({
-    opacity: length ? 1 : 0,
-    height: length * cardDimensions.height + (length ? 90 : 0),
-    // Add 40 for padding
-    width: length ? cardDimensions.width + 40 : 0,
-  });
   return (
-    <NominationsDiv style={style as any}>
-      <Label>Nominated Movies</Label>
-      <HelpText>Drag Movies to Rearrange</HelpText>
+    <animated.div>
       {Object.keys(nominations).map((movieId) => {
         const movie = nominations[movieId];
         return (
@@ -85,12 +66,42 @@ const Nominations = ({
               onClick={() => {
                 removeOnClick(movie);
               }}
+              marginTop={7}
+              marginRight={7}
             >
-              &times;
+              <X size={22} />
             </RemoveButton>
           </MovieCard>
         );
       })}
+    </animated.div>
+  );
+};
+
+const Nominations = ({
+  nominations,
+  movieOnClick,
+  removeOnClick,
+}: NominationsProps) => {
+  // Make the element invisible if there are no nominations
+  const style = useSpring({
+    opacity: nominations.len ? 1 : 0,
+    height:
+      nominations.len * (cardDimensions.height + cardDimensions.TBMargin) +
+      (nominations.len ? 90 : 0),
+    // 40px of margin
+    width: (nominations.len ? cardDimensions.width : 0) + 40,
+  });
+
+  return (
+    <NominationsDiv style={style as any}>
+      <Label>Nominated Movies</Label>
+      <HelpText>Drag Movies to Rearrange</HelpText>
+      <NominationsCards
+        nominations={nominations}
+        movieOnClick={movieOnClick}
+        removeOnClick={removeOnClick}
+      />
     </NominationsDiv>
   );
 };

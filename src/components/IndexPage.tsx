@@ -6,6 +6,9 @@ import SearchBar from "components/SearchBar";
 import MovieResults from "components/MovieResults";
 import AnimatedElement from "components/AnimatedElement";
 import Nominations, { NominationsStore } from "components/Nominations";
+import NotificationCenter, {
+  NotificationValue,
+} from "components/Notifications";
 
 import useSearch from "hooks/useSearch";
 
@@ -33,12 +36,47 @@ const IndexPage = () => {
   // shows a trophy of some sort
   const [alt, setAlt] = useState(true);
 
-  const [nominated, setNominated] = useState<NominationsStore>({});
+  const [nominated, setNominated] = useState<NominationsStore>({
+    len: 0,
+    nominations: {},
+  });
+
+  const [nominatedDisabled, setNominatedDisabled] = useState(false);
 
   const displayMovieInfo = () => {};
 
+  const [notifications, setNotifications] = useState<Array<NotificationValue>>(
+    []
+  );
+  const [notificationIdx, setNotificationIdx] = useState(0);
+
+  useEffect(() => {
+    if (nominated.len >= 5) {
+      setNominatedDisabled(true);
+      setNotifications((notifications) => {
+        setNotificationIdx((nIdx) => nIdx + 1);
+        return [
+          ...notifications,
+          {
+            id: notificationIdx,
+            message:
+              "You've picked 5 nominations, thanks! Feel free to make make changes to your nominations or rearrange them.",
+            // Make notification last for 5 seconds
+            duration: 5000,
+          },
+        ];
+      });
+    } else {
+      setNominatedDisabled(false);
+    }
+  }, [nominated]);
+
   return (
     <CenteredWrapper>
+      <NotificationCenter
+        notifications={notifications}
+        setNotifications={setNotifications}
+      />
       <HorizontalWrapper style={{ marginTop: "50px" }}>
         {alt ? <LargeHeading>🏆</LargeHeading> : <></>}
         <img
@@ -64,17 +102,28 @@ const IndexPage = () => {
           movies={isOk(search_results) ? search_results : []}
           movieOnClick={displayMovieInfo}
           movieOnNominate={(movie: Movie) =>
-            setNominated({ ...nominated, [movie.id]: movie })
+            setNominated((nominated) => ({
+              // Increment length
+              len: nominated.len + 1,
+              nominations: { ...nominated.nominations, [movie.id]: movie },
+            }))
           }
           nominated={nominated}
+          nominatedDisabled={nominatedDisabled}
         />
         <Nominations
           nominations={nominated}
           movieOnClick={displayMovieInfo}
           removeOnClick={({ id }) => {
-            let newNominated = { ...nominated };
-            delete newNominated[id];
-            setNominated(newNominated);
+            setNominated((nominated) => {
+              let newNominated = { ...nominated.nominations };
+              delete newNominated[id];
+              return {
+                // Decrement length
+                len: nominated.len - 1,
+                nominations: newNominated,
+              };
+            });
           }}
         />
       </HorizontalWrapper>

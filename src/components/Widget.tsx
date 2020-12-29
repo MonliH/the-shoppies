@@ -62,3 +62,20 @@ export const Button = ({ children, disabled, ...props }: ButtonProps) => {
     </ButtonStyle>
   );
 };
+
+interface RemoveButtonProps extends React.HTMLAttributes<HTMLButtonElement> {
+  marginTop: number;
+  marginRight: number;
+}
+
+export const RemoveButton = styled.button`
+  border: none;
+  outline: 0;
+  background: transparent;
+  position: absolute;
+  top: 0;
+  right: 0;
+  margin-top: ${(props: RemoveButtonProps) => props.marginTop}px;
+  margin-right: ${(props: RemoveButtonProps) => props.marginRight}px;
+  cursor: pointer;
+`;
