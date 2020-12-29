@@ -41,6 +41,8 @@ export const SmallHeading = styled.h2`
 export const Label = styled.label`
   font: bold 15px ${fontSans};
   color: #4b4b4b;
+  display: block;
+  margin-bottom: 7px;
 `;
 
 export const NormalText = styled.p`

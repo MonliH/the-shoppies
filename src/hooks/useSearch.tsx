@@ -11,16 +11,28 @@ const useSearch = (): [
 ] => {
   const [query, set_query] = useState<string>("");
   const [results, set_results] = useState<Result<Array<Movie>>>([]);
+  const [timer, setTimer] = useState<null | NodeJS.Timeout>(null);
+
   useEffect(() => {
     (async () => {
-      if (query && query !== "") {
-        set_results(await searchMovies(query));
-      } else {
-        // Empty query
+      if (query.length === 0) {
         set_results([]);
+      } else {
+        // Debouncing
+        const later = async () => {
+          setTimer(null);
+          set_results(await searchMovies(query));
+        };
+
+        if (timer) {
+          clearTimeout(timer);
+        }
+
+        setTimer(setTimeout(later, 300));
       }
     })();
   }, [query]);
+
   return [query, set_query, results];
 };
 

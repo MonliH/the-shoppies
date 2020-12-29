@@ -19,7 +19,6 @@ const SearchBarInput = styled.input`
   border-radius: 2px;
 
   padding: 9px;
-  margin-top: 5px;
 
   &:focus {
     outline: 0;
@@ -48,7 +47,6 @@ const SearchBar = ({
     <StyledPadding onMouseEnter={onMouseEnter}>
       <form onSubmit={(e) => e.preventDefault()}>
         <Label htmlFor="searchbar">Search for a Movie</Label>
-        <br />
         <SearchBarInput
           type="search"
           id="searchbar"
