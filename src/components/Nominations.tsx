@@ -5,7 +5,6 @@ import {
   useTransition,
   useSpring,
   animated,
-  SpringStartFn,
   useSprings,
 } from "react-spring";
 import { useDrag } from "react-use-gesture";
@@ -25,18 +24,6 @@ export interface NominationsStore {
 }
 
 export type ModifiedOrder = Array<[omdbId, number]>;
-
-interface AnimatedProps {
-  y: number;
-  scale: number;
-  zIndex: string;
-  shadow: number;
-  immediate: any;
-}
-
-export type Springs = Array<
-  [AnimatedProps, SpringStartFn<AnimatedProps>, () => {}]
->;
 
 interface NominationsProps extends MovieInteraction {
   removeOnClick: (movie: Movie, callback?: () => void) => void;
