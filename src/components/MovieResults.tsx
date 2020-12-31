@@ -8,6 +8,7 @@ import { cardDimensions } from "components/MovieCard";
 import { NominationsStore } from "components/Nominations";
 
 import { Movie } from "lib/movieModel";
+
 import useWindowDimensions from "hooks/useWindowDimensions";
 
 const SearchResultsWrapper = styled(animated.div)`
@@ -109,7 +110,7 @@ const MovieResults = ({
 
   const fragment = transitions((style, item: MoviePosition) => {
     let { xy, ...others } = style;
-    const alreadyNominated = nominated.nominations.hasOwnProperty(
+    const alreadyNominated = nominated.hasOwnProperty(
       item.movie.id
     );
 

@@ -1,7 +1,7 @@
-export type imdbId = string;
+export type omdbId = string;
 
 export interface Movie {
-  id: imdbId;
+  id: omdbId;
   releaseYear: number;
   title: string;
   posterUrl: string;

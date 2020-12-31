@@ -56,7 +56,8 @@ export const Button = ({ children, disabled, ...props }: ButtonProps) => {
       onMouseOver={() => setHover(true)}
       onMouseLeave={() => setHover(false)}
       {...props}
-      style={{ ...props.style, ...style } as any}
+      style={{ ...props.style, ...style } as any // Again, a bug in react spring: https://github.com/react-spring/react-spring/issues/1102
+        }
     >
       {children}
     </ButtonStyle>
@@ -70,7 +71,6 @@ interface RemoveButtonProps extends React.HTMLAttributes<HTMLButtonElement> {
 
 export const RemoveButton = styled.button`
   border: none;
-  outline: 0;
   background: transparent;
   position: absolute;
   top: 0;

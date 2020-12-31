@@ -15,7 +15,8 @@ const useSearch = (): [
 
   useEffect(() => {
     (async () => {
-      if (query.length === 0) {
+      if (!query.length) {
+        // Clear results
         set_results([]);
       } else {
         // Debouncing

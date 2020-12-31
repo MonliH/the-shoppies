@@ -5,7 +5,10 @@ import { LargeHeading, NormalText } from "components/Text";
 import SearchBar from "components/SearchBar";
 import MovieResults from "components/MovieResults";
 import AnimatedElement from "components/AnimatedElement";
-import Nominations, { NominationsStore } from "components/Nominations";
+import Nominations, {
+  NominationsStore,
+  ModifiedOrder,
+} from "components/Nominations";
 import NotificationCenter, {
   NotificationValue,
 } from "components/Notifications";
@@ -36,13 +39,6 @@ const IndexPage = () => {
   // shows a trophy of some sort
   const [alt, setAlt] = useState(true);
 
-  const [nominated, setNominated] = useState<NominationsStore>({
-    len: 0,
-    nominations: {},
-  });
-
-  const [nominatedDisabled, setNominatedDisabled] = useState(false);
-
   const displayMovieInfo = () => {};
 
   const [notifications, setNotifications] = useState<Array<NotificationValue>>(
@@ -50,8 +46,14 @@ const IndexPage = () => {
   );
   const [notificationIdx, setNotificationIdx] = useState(0);
 
+  // List of reorderings
+  const [modifiedOrder, setModifiedOrder] = useState<ModifiedOrder>([]);
+  // Object of movieid to movie for selected objects
+  const [nominations, setNominated] = useState<NominationsStore>({});
+  const [nominatedDisabled, setNominatedDisabled] = useState(false);
+
   useEffect(() => {
-    if (nominated.len >= 5) {
+    if (modifiedOrder.length >= 5) {
       setNominatedDisabled(true);
       setNotifications((notifications) => {
         setNotificationIdx((nIdx) => nIdx + 1);
@@ -69,7 +71,7 @@ const IndexPage = () => {
     } else {
       setNominatedDisabled(false);
     }
-  }, [nominated]);
+  }, [nominations]);
 
   return (
     <CenteredWrapper>
@@ -101,30 +103,41 @@ const IndexPage = () => {
         <MovieResults
           movies={isOk(search_results) ? search_results : []}
           movieOnClick={displayMovieInfo}
-          movieOnNominate={(movie: Movie) =>
-            setNominated((nominated) => ({
-              // Increment length
-              len: nominated.len + 1,
-              nominations: { ...nominated.nominations, [movie.id]: movie },
-            }))
-          }
-          nominated={nominated}
+          movieOnNominate={(movie: Movie) => {
+            // Add this element to the end of the list
+            setModifiedOrder(
+              (modifiedOrd) => [...modifiedOrd, [movie.id, modifiedOrd.length]],
+            );
+            setNominated((nom) => ({
+              ...nom,
+              [movie.id]: movie,
+            }));
+          }}
+          nominated={nominations}
           nominatedDisabled={nominatedDisabled}
         />
         <Nominations
-          nominations={nominated}
           movieOnClick={displayMovieInfo}
           removeOnClick={({ id }) => {
-            setNominated((nominated) => {
-              let newNominated = { ...nominated.nominations };
+            // Remove that value
+            setModifiedOrder((modOrd) => {
+              const idIdx = modOrd.findIndex(([dbId]) => id === dbId);
+              const removedIdx = modOrd[idIdx][1];
+
+              return modOrd
+                .filter(([dbId]) => dbId !== id)
+                .map(([dbId, idx]) => [dbId, idx > removedIdx ? idx - 1 : idx]);
+            });
+
+            setNominated((nom) => {
+              let newNominated = { ...nom };
               delete newNominated[id];
-              return {
-                // Decrement length
-                len: nominated.len - 1,
-                nominations: newNominated,
-              };
+              return newNominated;
             });
           }}
+          modifiedOrder={modifiedOrder}
+          setModifiedOrder={setModifiedOrder}
+          nominations={nominations}
         />
       </HorizontalWrapper>
     </CenteredWrapper>

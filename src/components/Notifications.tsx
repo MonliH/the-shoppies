@@ -19,9 +19,9 @@ const Notification = styled(animated.div)`
   background-color: #1a1a1a;
   background-color: rgba(0, 0, 0, 0.7);
   backdrop-filter: blur(2px);
-  width: 500px;
+  width: 650px;
   position: relative;
-  @media (max-width: 600px) {
+  @media (max-width: 700px) {
     width: 90%;
   }
   border-radius: 4px;
@@ -32,14 +32,14 @@ const Notification = styled(animated.div)`
 const NotificationContent = styled.div`
   height: auto;
   padding: 15px 10px;
+  /* Account for size of X */
+  padding-right: 35px;
   color: white;
   font: 15px ${fontSans};
-  display: flex;
-  flex-direction: row;
 `;
 
 const NotificationContainer = styled.div`
-  position: absolute;
+  position: fixed;
   z-index: 50;
   display: flex;
   /* The notifications should come in from the top */
@@ -100,20 +100,24 @@ const NotificationCenter = ({
   return (
     <NotificationContainer>
       {transitions(({ time, ...style }, item: NotificationValue) => (
-        <Notification style={style as any}>
+        <Notification
+          style={
+            style as any // Again, a bug in react spring: https://github.com/react-spring/react-spring/issues/1102
+          }
+        >
           <NotificationContent ref={(ref) => ref && refMap.set(item.id, ref)}>
             {item.message}
             <Counter style={{ right: time }} />
-            <RemoveButton
-              onClick={
-                () => cancelMap.get(item.id)("time") // Remove notification
-              }
-              marginTop={15}
-              marginRight={10}
-            >
-              <X size={23} color="white" />
-            </RemoveButton>
           </NotificationContent>
+          <RemoveButton
+            onClick={
+              () => cancelMap.get(item.id)("time") // Remove notification
+            }
+            marginTop={15}
+            marginRight={10}
+          >
+            <X size={23} color="white" />
+          </RemoveButton>
         </Notification>
       ))}
     </NotificationContainer>
