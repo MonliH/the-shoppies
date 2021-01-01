@@ -93,12 +93,14 @@ const IndexPage = () => {
       />
       <MovieInfoPopup
         fullInfo={details}
+        onHide={() => {
+          // Remove details
+          setDetails(null);
+        }}
         visible={showDetails}
         onClose={() => {
           // Hide panel
           setShowDetails(false);
-          // Remove details
-          setDetails(null);
         }}
       />
       <HorizontalWrapper style={{ marginTop: "50px" }}>

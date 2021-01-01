@@ -129,8 +129,10 @@ const MovieInfoPopup = ({
   fullInfo,
   visible,
   onClose,
+  onHide
 }: {
   fullInfo: FullMovie | null;
+  onHide: () => void,
   visible: boolean;
   onClose: () => void;
 }) => {
@@ -141,6 +143,9 @@ const MovieInfoPopup = ({
     transform: visible ? "translate3d(0, 0, 0)" : "translate3d(0, -100vh, 0)",
     onRest: () => {
       setDisplay((display) => (visible ? display : "none"));
+      if (display == "none" && !visible) {
+          onHide();
+      }
     },
   });
   const backgroundStyle = useSpring({
