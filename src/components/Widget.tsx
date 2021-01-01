@@ -25,7 +25,7 @@ export const AnimatedStyledPadding = styled(animated.div)`
 const ButtonStyle = styled(animated.button)`
   width: fit-content;
   height: fit-content;
-  padding: 5px;
+  padding: 6px 7px;
   margin-top: 5px;
   background-color: white;
   border: 1px solid #b3b3b3;
