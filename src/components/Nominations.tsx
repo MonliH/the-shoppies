@@ -54,6 +54,8 @@ const CardWrapper = styled(animated.div)`
 
 const SelectionsWrapper = styled.div`
   position: relative;
+  /* Disable selecting because dragging causes it to be buggy */
+  user-select: none;
 `;
 
 const totalHeight = cardDimensions.height + cardDimensions.TBMargin - 10;
