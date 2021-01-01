@@ -198,7 +198,16 @@ const MovieInfoPopup = ({
                 <b>{new Date(fullInfo.releaseDate!).toLocaleDateString()}</b>
               </NormalTextSmall>
             </MovieFact>
-            <MovieFact Icon={FeatherIcons.User}>
+            <MovieFact
+              Icon={FeatherIcons.User}
+              value={fullInfo.director}
+              notFoundText="Director not found"
+            >
+              <NormalTextSmall>
+                Directed by <b>{fullInfo.director}</b>
+              </NormalTextSmall>
+            </MovieFact>
+            <MovieFact Icon={FeatherIcons.Users}>
               <NormalTextSmall>
                 Starring <b>{addAnd(fullInfo.actors)}</b>
               </NormalTextSmall>
@@ -236,6 +245,15 @@ const MovieInfoPopup = ({
               </NormalTextSmall>
             </MovieFact>
             <MovieFact
+              Icon={FeatherIcons.Clock}
+              value={fullInfo.runtime}
+              notFoundText="Runtime not available"
+            >
+              <NormalTextSmall>
+                <b>{fullInfo.runtime}</b> long
+              </NormalTextSmall>
+            </MovieFact>
+            <MovieFact
               Icon={FeatherIcons.DollarSign}
               value={fullInfo.boxOffice}
               notFoundText="Box office not available"
@@ -259,7 +277,7 @@ const MovieInfoPopup = ({
               notFoundText="Country not available"
             >
               <NormalTextSmall>
-                Produced in <b>{fullInfo.country}</b>
+                Produced in <b>{addAnd(fullInfo.country)}</b>
               </NormalTextSmall>
             </MovieFact>
             <MovieFact
