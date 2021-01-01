@@ -2,7 +2,7 @@ import React, { ReactNode, useState, useEffect } from "react";
 import styled from "styled-components";
 import { animated, useSpring } from "react-spring";
 
-import {fontSans} from "components/Text";
+import { fontSans } from "components/Text";
 
 const shared = `
   width: fit-content;

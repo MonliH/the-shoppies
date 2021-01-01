@@ -14,25 +14,30 @@ const useSearch = (): [
   const [timer, setTimer] = useState<null | NodeJS.Timeout>(null);
 
   useEffect(() => {
-    (async () => {
-      if (!query.length) {
-        // Clear results
-        set_results([]);
-      } else {
-        // Debouncing
-        const later = async () => {
-          setTimer(null);
-          set_results(await searchMovies(query));
-        };
+    if (!query.length) {
+      // Clear results
+      set_results([]);
+    } else {
+      // Debouncing
+      const later = async () => {
+        setTimer(null);
+        set_results(await searchMovies(query));
+      };
 
-        if (timer) {
-          clearTimeout(timer);
-        }
-
-        setTimer(setTimeout(later, 300));
+      if (timer) {
+        clearTimeout(timer);
       }
-    })();
+
+      setTimer(setTimeout(later, 300));
+    }
   }, [query]);
+
+  useEffect(() => {
+    if (!query.length && results.length !== 0) {
+      // Clear results when search bar is empty
+      set_results([]);
+    }
+  }, [results]);
 
   return [query, set_query, results];
 };

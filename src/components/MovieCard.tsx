@@ -142,11 +142,7 @@ const MovieCardImage = styled(MovieImage)`
   font-size: 18px;
 `;
 
-export const MovieCard = ({
-  movie,
-  children,
-  cursor,
-}: MovieCardProps) => {
+export const MovieCard = ({ movie, children, cursor }: MovieCardProps) => {
   const [hover, setHover] = useState(false);
 
   const style = useSpring({

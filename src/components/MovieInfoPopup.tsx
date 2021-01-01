@@ -129,10 +129,10 @@ const MovieInfoPopup = ({
   fullInfo,
   visible,
   onClose,
-  onHide
+  onHide,
 }: {
   fullInfo: FullMovie | null;
-  onHide: () => void,
+  onHide: () => void;
   visible: boolean;
   onClose: () => void;
 }) => {
@@ -144,10 +144,11 @@ const MovieInfoPopup = ({
     onRest: () => {
       setDisplay((display) => (visible ? display : "none"));
       if (display == "none" && !visible) {
-          onHide();
+        onHide();
       }
     },
   });
+
   const backgroundStyle = useSpring({
     opacity: visible ? 1 : 0,
     onStart: () => {
