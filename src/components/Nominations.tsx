@@ -67,7 +67,7 @@ const adjust = (
   curIndex?: number,
   y?: number
 ) => (index: number) =>
-  down && curIndex && y && index === originalIndex
+  down && curIndex !== undefined && y !== undefined && index === originalIndex
     ? {
         y: curIndex * totalHeight + y,
         scale: 1.1,
@@ -151,7 +151,7 @@ const NominationsCards = ({
     } else {
       getNewModifiedOrder(modifiedOrder);
     }
-  });
+  }, {});
 
   return (
     <SelectionsWrapper>

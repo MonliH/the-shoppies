@@ -97,6 +97,8 @@ const IndexPage = () => {
         onClose={() => {
           // Hide panel
           setShowDetails(false);
+          // Remove details
+          setDetails(null);
         }}
       />
       <HorizontalWrapper style={{ marginTop: "50px" }}>

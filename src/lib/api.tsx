@@ -25,7 +25,6 @@ export const searchMovies = async (
 export const getFullMovie = async (movieId: omdbId): Promise<FullMovie> => {
   const res = await fetch(`${BASE_URL}i=${movieId}&type=movie&plot=full`);
   const json = await res.json();
-  console.log(json.Released);
 
   const fullMovie = {
     id: json.imdbID,
@@ -45,15 +44,6 @@ export const getFullMovie = async (movieId: omdbId): Promise<FullMovie> => {
     releaseDate: json.Released,
     runtime: json.Runtime,
   };
-
-  console.log(
-    Object.fromEntries(
-      Object.entries(fullMovie).map(([key, value]) => [
-        key,
-        isEmpty(value) ? null : value,
-      ])
-    ) as FullMovie
-  );
 
   return Object.fromEntries(
     Object.entries(fullMovie).map(([key, value]) => [
