@@ -1,4 +1,4 @@
-import React, { useState, ReactNode } from "react";
+import React, { CSSProperties, useState, ReactNode } from "react";
 import { useSpring } from "react-spring";
 import styled from "styled-components";
 import { CameraOff } from "react-feather";
@@ -6,6 +6,7 @@ import { CameraOff } from "react-feather";
 import { VerticalWrapper, HorizontalWrapper } from "components/Wrappers";
 import { SmallHeading, NormalText } from "components/Text";
 import { AnimatedStyledPadding } from "components/Widget";
+
 import { Movie } from "lib/movieModel";
 
 // Card width
@@ -19,21 +20,17 @@ export const cardDimensions = {
   TBMargin: 20,
 };
 
-const MovieImage = styled.img`
-  width: 60px;
-  height: 95px;
+const MovieImg = styled.img`
   border-radius: 3px;
   object-fit: cover;
 `;
 
-const MovieFallback = styled(MovieImage).attrs({ as: "div" })`
+const MovieFallback = styled(MovieImg).attrs({ as: "div" })`
   display: flex;
   align-items: center;
   justify-content: center;
   flex-direction: column;
   background-color: #efefef;
-  min-width: 60px;
-  min-height: 95px;
 `;
 
 const MoviePadding = styled(AnimatedStyledPadding)`
@@ -67,9 +64,19 @@ const MovieHeading = styled(SmallHeading)`
   font-size: 17px;
 `;
 
-const MovieImageFallback = ({ title }: { title: string }) => (
-  <MovieFallback>
-    <SmallHeading>
+const MovieImageFallback = ({
+  title,
+  className,
+  iconSize,
+  style,
+}: {
+  title: string;
+  className?: string;
+  iconSize: number;
+  style?: CSSProperties;
+}) => (
+  <MovieFallback className={className} style={style}>
+    <SmallHeading style={{ fontSize: "inherit" }}>
       {
         // Put initials of movie
         title
@@ -79,7 +86,7 @@ const MovieImageFallback = ({ title }: { title: string }) => (
           .join("")
       }
     </SmallHeading>
-    <CameraOff size={20} />
+    <CameraOff size={iconSize} color="#363636" />
   </MovieFallback>
 );
 
@@ -93,13 +100,54 @@ interface MovieCardProps extends MovieInteraction {
   children?: ReactNode;
 }
 
+export const MovieImage = ({
+  url,
+  fallbackTitle,
+  iconSize,
+  className,
+  style,
+}: {
+  url?: string;
+  fallbackTitle: string;
+  iconSize: number;
+  className?: string;
+  style?: CSSProperties;
+}) => {
+  const [isErr, setIsErr] = useState(false);
+  return isErr || !url ? (
+    <MovieImageFallback
+      title={fallbackTitle}
+      className={className}
+      iconSize={iconSize}
+      style={style}
+    />
+  ) : (
+    <MovieImg
+      alt="Movie Poster"
+      onError={() => {
+        setIsErr(true);
+      }}
+      src={url}
+      className={className}
+      style={style}
+    />
+  );
+};
+
+const MovieCardImage = styled(MovieImage)`
+  width: 60px;
+  height: 95px;
+  min-width: 60px;
+  min-height: 95px;
+  font-size: 18px;
+`;
+
 export const MovieCard = ({
   movieOnClick,
   movie,
   children,
   cursor,
 }: MovieCardProps) => {
-  const [isErr, setIsErr] = useState(false);
   const [hover, setHover] = useState(false);
 
   const style = useSpring({
@@ -115,20 +163,14 @@ export const MovieCard = ({
       style={{ ...style, cursor: cursor } as any} // Note: a bug in react spring, see MovieResults component for more info
     >
       <MovieHW>
-        {isErr ? (
-          <MovieImageFallback title={movie.title} />
-        ) : (
-          <MovieImage
-            alt="Movie Poster"
-            onError={() => {
-              setIsErr(true);
-            }}
-            src={movie.posterUrl}
-          />
-        )}
+        <MovieCardImage
+          url={movie.posterUrl}
+          fallbackTitle={movie.title}
+          iconSize={20}
+        />
         <MovieVW>
           <MovieHeading>
-            {movie.title.length > 50
+            {movie.title.length > 40
               ? `${movie.title.slice(0, 30)}...`
               : movie.title}
           </MovieHeading>

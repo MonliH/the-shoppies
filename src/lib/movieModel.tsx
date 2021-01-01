@@ -7,9 +7,21 @@ export interface Movie {
   posterUrl: string;
 }
 
-export interface FullMovie extends Movie {
-  releaseDate: Date;
-  actors: string;
-  director: string;
-  productionCompany: string;
+export interface FullMovie {
+  id: omdbId;
+  title: string;
+  posterUrl: string;
+  actors: string | null;
+  ageRating: string | null;
+  boxOffice: string | null;
+  country: string | null;
+  director: string | null;
+  genre: string | null;
+  language: string | null;
+  plot: string | null;
+  productionCompany: string | null;
+  releaseDate: string | null;
+  runtime: string | null;
+  imdbRating: string | null;
+  imdbVotes: string | null;
 }

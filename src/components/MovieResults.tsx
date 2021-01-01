@@ -110,9 +110,7 @@ const MovieResults = ({
 
   const fragment = transitions((style, item: MoviePosition) => {
     let { xy, ...others } = style;
-    const alreadyNominated = nominated.hasOwnProperty(
-      item.movie.id
-    );
+    const alreadyNominated = nominated.hasOwnProperty(item.movie.id);
 
     return (
       <animated.div
@@ -131,7 +129,9 @@ const MovieResults = ({
       >
         <MovieCard movie={item.movie} movieOnClick={movieOnClick}>
           <Button
-            onClick={() => {
+            onClick={(e) => {
+              // Prevent onclick from being activated on the card, too
+              e.stopPropagation();
               movieOnNominate(item.movie);
             }}
             // Disabled if it's already been nominated, or if everything is disabled

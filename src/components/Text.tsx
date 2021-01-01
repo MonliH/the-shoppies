@@ -29,7 +29,16 @@ export const LargeHeading = styled.h1`
   margin-bottom: 10px;
 `;
 
-export const SmallHeading = styled.h2`
+export const MediumHeading = styled.h2`
+  font: bold 25px ${fontSans};
+
+  color: #292929;
+
+  margin: 0;
+  margin-bottom: 10px;
+`;
+
+export const SmallHeading = styled.h3`
   font: bold 18px ${fontSans};
 
   color: #363636;
@@ -51,4 +60,12 @@ export const NormalText = styled.p`
 
   margin: 0;
   margin-bottom: 20px;
+`;
+
+export const NormalTextSmall = styled.p`
+  font: 15px ${fontSans};
+  color: #3b3b3b;
+
+  margin: 0;
+  margin-bottom: 3px;
 `;

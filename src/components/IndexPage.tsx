@@ -12,11 +12,13 @@ import Nominations, {
 import NotificationCenter, {
   NotificationValue,
 } from "components/Notifications";
+import MovieInfoPopup from "components/MovieInfoPopup";
 
 import useSearch from "hooks/useSearch";
 
 import { isOk } from "lib/result";
-import { Movie } from "lib/movieModel";
+import { getFullMovie } from "lib/api";
+import { FullMovie, Movie } from "lib/movieModel";
 
 const IndexPage = () => {
   const [query, set_query, search_results] = useSearch();
@@ -33,14 +35,6 @@ const IndexPage = () => {
     }
   }, [search_results, query]);
 
-  // If set to true, we render the emoji
-  // If false, we render the svg logo
-  // We use this for a fallback for the logo, so it always
-  // shows a trophy of some sort
-  const [alt, setAlt] = useState(true);
-
-  const displayMovieInfo = () => {};
-
   const [notifications, setNotifications] = useState<Array<NotificationValue>>(
     []
   );
@@ -51,6 +45,19 @@ const IndexPage = () => {
   // Object of movieid to movie for selected objects
   const [nominations, setNominated] = useState<NominationsStore>({});
   const [nominatedDisabled, setNominatedDisabled] = useState(false);
+
+  const [details, setDetails] = useState<FullMovie | null>(null);
+  const [showDetails, setShowDetails] = useState<boolean>(false);
+
+  const displayMovieInfo = (movie: Movie) => {
+    (async () => {
+      if (!details || details.id !== movie.id) {
+        // Only fetch the movie if it wasn't the most recently fetched
+        setDetails(await getFullMovie(movie.id));
+      }
+      setShowDetails(true);
+    })();
+  };
 
   useEffect(() => {
     if (modifiedOrder.length >= 5) {
@@ -73,17 +80,30 @@ const IndexPage = () => {
     }
   }, [nominations]);
 
+  // If set to true, we render the emoji
+  // If false, we render the svg logo
+  // We use this for a fallback for the logo, so it always shows a trophy (of some sort)
+  const [alt, setAlt] = useState(false);
+
   return (
     <CenteredWrapper>
       <NotificationCenter
         notifications={notifications}
         setNotifications={setNotifications}
       />
+      <MovieInfoPopup
+        fullInfo={details}
+        visible={showDetails}
+        onClose={() => {
+          // Hide panel
+          setShowDetails(false);
+        }}
+      />
       <HorizontalWrapper style={{ marginTop: "50px" }}>
         {alt ? <LargeHeading>🏆</LargeHeading> : <></>}
         <img
           alt="Logo"
-          onError={() => setAlt(false)}
+          onError={() => setAlt(true)}
           onLoad={() => setAlt(false)}
           style={{ display: alt ? "none" : "block" }}
           src="/logo192.png"
@@ -105,9 +125,10 @@ const IndexPage = () => {
           movieOnClick={displayMovieInfo}
           movieOnNominate={(movie: Movie) => {
             // Add this element to the end of the list
-            setModifiedOrder(
-              (modifiedOrd) => [...modifiedOrd, [movie.id, modifiedOrd.length]],
-            );
+            setModifiedOrder((modifiedOrd) => [
+              ...modifiedOrd,
+              [movie.id, modifiedOrd.length],
+            ]);
             setNominated((nom) => ({
               ...nom,
               [movie.id]: movie,

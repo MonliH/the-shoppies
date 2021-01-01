@@ -7,7 +7,7 @@ export const CenteredWrapper = styled.div`
   justify-content: center;
   align-items: center;
   flex-direction: column;
-`; 
+`;
 
 export const VerticalWrapper = styled.div`
   display: flex;
@@ -17,4 +17,9 @@ export const VerticalWrapper = styled.div`
 export const HorizontalWrapper = styled.div`
   display: flex;
   flex-direction: row;
+`;
+
+export const FullHorizontalWrapper = styled(HorizontalWrapper)`
+  height: 100%;
+  width: 100%;
 `;
