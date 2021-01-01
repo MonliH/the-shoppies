@@ -124,7 +124,7 @@ const IndexPage = () => {
       <HorizontalWrapper>
         <MovieResults
           movies={isOk(search_results) ? search_results : []}
-          movieOnClick={displayMovieInfo}
+          movieOnInfo={displayMovieInfo}
           movieOnNominate={(movie: Movie) => {
             // Add this element to the end of the list
             setModifiedOrder((modifiedOrd) => [
@@ -140,7 +140,7 @@ const IndexPage = () => {
           nominatedDisabled={nominatedDisabled}
         />
         <Nominations
-          movieOnClick={displayMovieInfo}
+          movieOnInfo={displayMovieInfo}
           removeOnClick={({ id }) => {
             // Remove that value
             setModifiedOrder((modOrd) => {

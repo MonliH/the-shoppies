@@ -2,6 +2,8 @@ import React, { ReactNode, useState, useEffect } from "react";
 import styled from "styled-components";
 import { animated, useSpring } from "react-spring";
 
+import {fontSans} from "components/Text";
+
 const shared = `
   width: fit-content;
   height: fit-content;
@@ -29,19 +31,32 @@ const ButtonStyle = styled(animated.button)`
   margin-top: 5px;
   background-color: white;
   border: 1px solid #b3b3b3;
-  border-radius: 3px;
+  border-radius: 1px;
+  font: 13px ${fontSans};
 `;
 
 interface ButtonProps extends React.HTMLAttributes<HTMLButtonElement> {
   children: ReactNode;
   disabled?: boolean;
+  hoverColor?: [string, string];
 }
 
-export const Button = ({ children, disabled, ...props }: ButtonProps) => {
+export const Button = ({
+  children,
+  disabled,
+  hoverColor,
+  ...props
+}: ButtonProps) => {
   const [hover, setHover] = useState<boolean>(false);
 
   const style = useSpring({
-    backgroundColor: hover ? "#EBEBEB" : "white",
+    backgroundColor: hoverColor
+      ? hover
+        ? hoverColor[1]
+        : hoverColor[0]
+      : hover
+      ? "#F5F5F5"
+      : "white",
   });
 
   useEffect(() => {
@@ -56,8 +71,9 @@ export const Button = ({ children, disabled, ...props }: ButtonProps) => {
       onMouseOver={() => setHover(true)}
       onMouseLeave={() => setHover(false)}
       {...props}
-      style={{ ...props.style, ...style } as any // Again, a bug in react spring: https://github.com/react-spring/react-spring/issues/1102
-        }
+      style={
+        { ...props.style, ...style } as any // Again, a bug in react spring: https://github.com/react-spring/react-spring/issues/1102
+      }
     >
       {children}
     </ButtonStyle>

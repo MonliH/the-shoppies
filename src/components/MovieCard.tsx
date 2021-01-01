@@ -91,10 +91,10 @@ const MovieImageFallback = ({
 );
 
 export interface MovieInteraction {
-  movieOnClick: (movie: Movie) => void;
+  movieOnInfo: (movie: Movie) => void;
 }
 
-interface MovieCardProps extends MovieInteraction {
+interface MovieCardProps {
   movie: Movie;
   cursor?: string;
   children?: ReactNode;
@@ -143,7 +143,6 @@ const MovieCardImage = styled(MovieImage)`
 `;
 
 export const MovieCard = ({
-  movieOnClick,
   movie,
   children,
   cursor,
@@ -157,7 +156,6 @@ export const MovieCard = ({
 
   return (
     <MoviePadding
-      onClick={movieOnClick ? () => movieOnClick(movie) : undefined}
       onMouseEnter={() => setHover(true)}
       onMouseLeave={() => setHover(false)}
       style={{ ...style, cursor: cursor } as any} // Note: a bug in react spring, see MovieResults component for more info

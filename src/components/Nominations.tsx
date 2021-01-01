@@ -87,7 +87,7 @@ const adjust = (
 
 const NominationsCards = ({
   removeOnClick,
-  movieOnClick,
+  movieOnInfo,
   modifiedOrder,
   setModifiedOrder,
   nominations,
@@ -172,8 +172,9 @@ const NominationsCards = ({
         } else {
           const y =
             modifiedOrder.findIndex((val) => val[0] === movie.id) * totalHeight;
+          console.log(y);
           props = {
-            transform: `translate3d(0, ${y}, 0)`,
+            transform: `translate3d(0, ${y}px, 0)`,
           };
         }
 
@@ -188,10 +189,10 @@ const NominationsCards = ({
             }
             key={movie.id}
           >
-            <MovieCard movie={movie} movieOnClick={() => {}} cursor={"grab"}>
+            <MovieCard movie={movie} cursor={"grab"}>
               <Button
                 onClick={() => {
-                  movieOnClick(movie);
+                  movieOnInfo(movie);
                 }}
               >
                 More Info

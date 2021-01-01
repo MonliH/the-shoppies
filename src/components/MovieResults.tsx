@@ -4,6 +4,7 @@ import styled from "styled-components";
 
 import MovieCard, { MovieInteraction } from "components/MovieCard";
 import { Button } from "components/Widget";
+import { HorizontalWrapper } from "components/Wrappers";
 import { cardDimensions } from "components/MovieCard";
 import { NominationsStore } from "components/Nominations";
 
@@ -29,9 +30,14 @@ interface MovieResultsProps extends MovieInteraction {
   nominatedDisabled: boolean;
 }
 
+const NominateButton = styled(Button)`
+  margin-right: 10px;
+  font-weight: 600;
+`;
+
 const MovieResults = ({
   movies,
-  movieOnClick,
+  movieOnInfo,
   movieOnNominate,
   nominated,
   nominatedDisabled,
@@ -127,25 +133,34 @@ const MovieResults = ({
           // See this https://github.com/react-spring/react-spring/issues/1102
         }
       >
-        <MovieCard movie={item.movie} movieOnClick={movieOnClick}>
-          <Button
-            onClick={(e) => {
-              // Prevent onclick from being activated on the card, too
-              e.stopPropagation();
-              movieOnNominate(item.movie);
-            }}
-            // Disabled if it's already been nominated, or if everything is disabled
-            // becuase there are over 5 nominations
-            disabled={alreadyNominated || nominatedDisabled}
-            style={{
-              cursor:
-                alreadyNominated || nominatedDisabled
-                  ? "not-allowed"
-                  : "default",
-            }}
-          >
-            {alreadyNominated ? "Nominated" : "Nominate"}
-          </Button>
+        <MovieCard movie={item.movie}>
+          <HorizontalWrapper style={{ marginTop: "2px" }}>
+            <NominateButton
+              onClick={(e) => {
+                // Prevent onclick from being activated on the card, too
+                e.stopPropagation();
+                movieOnNominate(item.movie);
+              }}
+              // Disabled if it's already been nominated, or if everything is disabled
+              // becuase there are over 5 nominations
+              disabled={alreadyNominated || nominatedDisabled}
+              style={{
+                cursor:
+                  alreadyNominated || nominatedDisabled
+                    ? "not-allowed"
+                    : "default",
+              }}
+            >
+              {alreadyNominated ? "Nominated" : "Nominate"}
+            </NominateButton>
+            <Button
+              onClick={() => {
+                movieOnInfo(item.movie);
+              }}
+            >
+              More Info
+            </Button>
+          </HorizontalWrapper>
         </MovieCard>
       </animated.div>
     );
