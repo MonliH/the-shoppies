@@ -93,13 +93,15 @@ const adjust = (
         immediate: false,
       };
 
-const instant = (heights: Array<number>) => (index: number) => ({
-  y: heights[index],
-  scale: 1,
-  zIndex: "0",
-  shadow: 1,
-  immediate: true,
-});
+const instant = (heights: Array<number>) => (index: number) => {
+  return {
+    y: heights[index],
+    scale: 1,
+    zIndex: "0",
+    shadow: 1,
+    immediate: true,
+  };
+};
 
 const NominationsCards = ({
   removeOnClick,
@@ -112,11 +114,11 @@ const NominationsCards = ({
   const removedMovie = useRef<string>("");
 
   setParentStyle({
-    opacity: previousOrder.length ? 1 : 0,
+    opacity: modifiedOrder.length ? 1 : 0,
     height:
-      previousOrder.length * totalHeight + (previousOrder.length ? 90 : 0),
+      modifiedOrder.length * totalHeight + (modifiedOrder.length ? 90 : 0),
     // 40px of margin
-    width: (previousOrder.length ? cardDimensions.width : 0) + 40,
+    width: (modifiedOrder.length ? cardDimensions.width : 0) + 40,
   });
 
   const [springs, setSprings] = useSprings(
@@ -175,9 +177,10 @@ const NominationsCards = ({
           opacity: 0,
         });
 
-        removedMovie.current = "";
-
-        setPreviousOrder(newOrder.slice(0, newOrder.length - 1));
+        setPreviousOrder((old) => {
+          removedMovie.current = "";
+          return old.slice(0, old.length - 1);
+        });
       },
       keys: ([{ id }]: [Movie, number]) => id,
       config: { mass: 1, tension: 170, friction: 26 },

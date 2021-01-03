@@ -75,7 +75,7 @@ const IndexPage = () => {
           },
         ];
       });
-    } else {
+    } else if (nominatedDisabled) {
       setNominatedDisabled(false);
     }
   }, [nominations]);
