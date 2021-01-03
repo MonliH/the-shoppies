@@ -32,7 +32,6 @@ interface MovieResultsProps extends MovieInteraction {
 
 const NominateButton = styled(Button)`
   margin-right: 10px;
-  font-weight: 600;
 `;
 
 const MovieResults = ({
@@ -149,6 +148,8 @@ const MovieResults = ({
                   alreadyNominated || nominatedDisabled
                     ? "not-allowed"
                     : "default",
+                fontWeight:
+                  alreadyNominated || nominatedDisabled ? "normal" : 600,
               }}
             >
               {alreadyNominated ? "Nominated" : "Nominate"}

@@ -70,28 +70,44 @@ const totalHeight = cardDimensions.height + cardDimensions.TBMargin - 10;
 
 const adjust = (
   order: ModifiedOrder,
+  deleted: Array<number>,
+  changing: boolean,
   down?: boolean,
   originalIndex?: number,
   curIndex?: number,
   y?: number
-) => (index: number) =>
-  down && curIndex !== undefined && y !== undefined && index === originalIndex
-    ? {
-        y: curIndex * totalHeight + y,
-        scale: 1.1,
-        zIndex: "1",
-        shadow: 15,
-        // We don't need to update y because it's delt with by react-use-gesture
-        // We don't need to animate z-index either
-        immediate: (n: string) => n === "y" || n === "zIndex",
-      }
-    : {
-        y: order.findIndex(([, idx]) => idx === index) * totalHeight,
-        scale: 1,
-        zIndex: "0",
-        shadow: 1,
-        immediate: false,
-      };
+) => (index: number) => {
+  if (!changing) {
+    return down &&
+      curIndex !== undefined &&
+      y !== undefined &&
+      index === originalIndex
+      ? {
+          y: curIndex * totalHeight + y,
+          scale: 1.1,
+          zIndex: "1",
+          shadow: 15,
+          // We don't need to update y because it's dealt with by react-use-gesture
+          // We don't need to animate z-index either
+          immediate: (n: string) => n === "y" || n === "zIndex",
+        }
+      : {
+          y: order.findIndex(([, idx]) => idx === index) * totalHeight,
+          scale: 1,
+          zIndex: "0",
+          shadow: 1,
+          immediate: false,
+        };
+  } else {
+    return {
+      y: deleted[index],
+      scale: 1,
+      zIndex: "0",
+      shadow: 1,
+      immediate: false,
+    };
+  }
+};
 
 const instant = (heights: Array<number>) => (index: number) => {
   return {
@@ -111,25 +127,28 @@ const NominationsCards = ({
   setParentStyle,
 }: NominationsInnerProps) => {
   const [previousOrder, setPreviousOrder] = useState<ModifiedOrder>([]);
-  const removedMovie = useRef<string>("");
+  const removedMovie = useRef<[string, Array<number>]>(["", []]);
+  const changing = useRef<boolean>(false);
 
   setParentStyle({
-    opacity: modifiedOrder.length ? 1 : 0,
+    opacity: previousOrder.length ? 1 : 0,
     height:
-      modifiedOrder.length * totalHeight + (modifiedOrder.length ? 90 : 0),
+      previousOrder.length * totalHeight + (previousOrder.length ? 90 : 0),
     // 40px of margin
-    width: (modifiedOrder.length ? cardDimensions.width : 0) + 40,
+    width: (previousOrder.length ? cardDimensions.width : 0) + 40,
   });
 
   const [springs, setSprings] = useSprings(
     previousOrder.length,
-    adjust(previousOrder),
+    adjust(previousOrder, removedMovie.current[1], changing.current),
     [previousOrder]
   );
 
   useEffect(() => {
-    setSprings(adjust(previousOrder));
-  }, [previousOrder]);
+    setSprings(
+      adjust(previousOrder, removedMovie.current[1], changing.current)
+    );
+  }, [previousOrder]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const transition = useTransition(
     modifiedOrder.map(
@@ -137,13 +156,13 @@ const NominationsCards = ({
     ),
     {
       from: {
-        left: -400,
+        height: 0,
         opacity: 0,
       },
       enter: ([movie, idx]) => async (next) => {
         setPreviousOrder((ord) => [...ord, [movie.id, idx]]);
         await next({
-          left: 0,
+          height: cardDimensions.height,
           opacity: 1,
         });
       },
@@ -167,20 +186,22 @@ const NominationsCards = ({
         newOrder.push([previousOrder[idIdx][0], newOrder.length]);
         values.push(idIdx * totalHeight);
 
-        removedMovie.current = movie.id;
-
+        removedMovie.current = [movie.id, values];
+        changing.current = true;
         await setSprings(instant(values));
         setPreviousOrder(newOrder);
 
         await next({
-          left: -400,
+          height: 0,
           opacity: 0,
         });
 
+        changing.current = false;
+
         setPreviousOrder((old) => {
-          removedMovie.current = "";
           return old.slice(0, old.length - 1);
         });
+        removedMovie.current = ["", []];
       },
       keys: ([{ id }]: [Movie, number]) => id,
       config: { mass: 1, tension: 170, friction: 26 },
@@ -207,7 +228,17 @@ const NominationsCards = ({
       newModifiedOrder.splice(curIndex, 1); // Remove it from the array
       newModifiedOrder.splice(curRow, 0, element); // Insert at curRow
 
-      setSprings(adjust(newModifiedOrder, down, args[0], curIndex, y));
+      setSprings(
+        adjust(
+          newModifiedOrder,
+          removedMovie.current[1],
+          changing.current,
+          down,
+          args[0],
+          curIndex,
+          y
+        )
+      );
       return newModifiedOrder;
     };
 
@@ -224,11 +255,12 @@ const NominationsCards = ({
         let props = {};
 
         const prevIndex = previousOrder.findIndex(([mov]) => mov === movie.id);
-        if (
+        const changedIdx =
           prevIndex !== -1 &&
           previousOrder[prevIndex][1] !== idx &&
-          removedMovie.current === movie.id
-        ) {
+          removedMovie.current[0] === movie.id;
+
+        if (changedIdx) {
           idx = previousOrder[prevIndex][1];
         }
 
@@ -244,10 +276,6 @@ const NominationsCards = ({
               (y, s) => `translate3d(0, ${y}px, 0) scale(${s})`
             ),
           };
-        } else {
-          props = {
-            opacity: 0,
-          };
         }
 
         return (
@@ -257,7 +285,7 @@ const NominationsCards = ({
               {
                 ...props,
                 ...style,
-                left: style.left.to((left) => `${left}px`),
+                height: style.height.to((height) => `${height}px`),
               } as any // Again, a bug in react spring: https://github.com/react-spring/react-spring/issues/1102
             }
             key={movie.id}

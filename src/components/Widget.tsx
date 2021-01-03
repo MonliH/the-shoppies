@@ -31,7 +31,7 @@ const ButtonStyle = styled(animated.button)`
   margin-top: 5px;
   background-color: white;
   border: 1px solid #b3b3b3;
-  box-shadow: 2px 2px 5px 1px #EBEBEB;
+  box-shadow: 2px 2px 5px 1px #ebebeb;
   border-radius: 1px;
   font: 13px ${fontSans};
 `;
@@ -52,12 +52,13 @@ export const Button = ({
 
   const style = useSpring({
     backgroundColor: hoverColor
-      ? hover
+      ? hover || disabled
         ? hoverColor[1]
         : hoverColor[0]
-      : hover
-      ? "#DEDEDE"
+      : hover || disabled
+      ? "#EFEFEF"
       : "#F7F7F7",
+    color: disabled ? "#474747" : "black",
   });
 
   useEffect(() => {
@@ -73,7 +74,10 @@ export const Button = ({
       onMouseLeave={() => setHover(false)}
       {...props}
       style={
-        { ...props.style, ...style } as any // Again, a bug in react spring: https://github.com/react-spring/react-spring/issues/1102
+        {
+          ...props.style,
+          ...style,
+        } as any // Again, a bug in react spring: https://github.com/react-spring/react-spring/issues/1102
       }
     >
       {children}
@@ -98,5 +102,5 @@ export const RemoveButton = styled.button`
 `;
 
 export const BigButton = styled(Button)`
-font-size: 20px;
+  font-size: 20px;
 `;

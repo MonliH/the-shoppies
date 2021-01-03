@@ -78,7 +78,7 @@ const IndexPage = () => {
     } else if (nominatedDisabled) {
       setNominatedDisabled(false);
     }
-  }, [nominations]);
+  }, [nominations]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // If set to true, we render the emoji
   // If false, we render the svg logo
