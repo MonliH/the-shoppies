@@ -1,12 +1,22 @@
-import React, { ReactNode, useState, useRef, useLayoutEffect } from "react";
+import React, {
+  ReactNode,
+  useEffect,
+  useState,
+  useRef,
+  useLayoutEffect,
+} from "react";
 import styled from "styled-components";
 import { animated, useSpring } from "react-spring";
 import * as FeatherIcons from "react-feather";
 
-import { VerticalWrapper, FullHorizontalWrapper } from "components/Wrappers";
+import {
+  VerticalWrapper,
+  FullHorizontalWrapper,
+  HorizontalWrapper,
+} from "components/Wrappers";
 import { MovieImage } from "components/MovieCard";
 import { MediumHeading, NormalTextSmall } from "components/Text";
-import { RemoveButton } from "components/Widget";
+import { BigButton, RemoveButton } from "components/Widget";
 
 import { FullMovie } from "lib/movieModel";
 import { getLinkHighRes, addAnd } from "lib/api";
@@ -125,27 +135,47 @@ const MovieFact = <T,>({
   );
 };
 
+const CenteredHorizontalWrapper = styled(HorizontalWrapper)`
+  margin-bottom: 10px;
+`;
+
+const MovieHeading = styled(MediumHeading)`
+  margin-right: 10px;
+  margin-bottom: 0px;
+  margin-top: 10px;
+`;
+
 const MovieInfoPopup = ({
   fullInfo,
   visible,
   onClose,
   onHide,
+  onNominate,
+  onRemove,
+  nominated,
 }: {
   fullInfo: FullMovie | null;
   onHide: () => void;
   visible: boolean;
   onClose: () => void;
+  onNominate: () => void;
+  onRemove: () => void;
+  nominated: boolean;
 }) => {
   const [display, setDisplay] = useState("none");
+
+  useEffect(() => {
+    // Clear previous movie so that the image doesn't flash
+    if (display === "none" && !visible) {
+      onHide();
+    }
+  }, [display]);
 
   const popupStyle = useSpring({
     opacity: visible ? 1 : 0,
     transform: visible ? "translate3d(0, 0, 0)" : "translate3d(0, -100vh, 0)",
     onRest: () => {
       setDisplay((display) => (visible ? display : "none"));
-      if (display == "none" && !visible) {
-        onHide();
-      }
     },
   });
 
@@ -193,7 +223,14 @@ const MovieInfoPopup = ({
             }}
           />
           <FactsWrapper ref={ref}>
-            <MediumHeading>{fullInfo.title}</MediumHeading>
+            <CenteredHorizontalWrapper>
+              <MovieHeading>{fullInfo.title}</MovieHeading>
+              {nominated ? (
+                <BigButton onClick={onRemove}>Remove</BigButton>
+              ) : (
+                <BigButton onClick={onNominate}>Nominate</BigButton>
+              )}
+            </CenteredHorizontalWrapper>
             <MovieFact
               Icon={FeatherIcons.Calendar}
               value={fullInfo.releaseDate}

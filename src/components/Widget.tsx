@@ -31,6 +31,7 @@ const ButtonStyle = styled(animated.button)`
   margin-top: 5px;
   background-color: white;
   border: 1px solid #b3b3b3;
+  box-shadow: 2px 2px 5px 1px #EBEBEB;
   border-radius: 1px;
   font: 13px ${fontSans};
 `;
@@ -55,8 +56,8 @@ export const Button = ({
         ? hoverColor[1]
         : hoverColor[0]
       : hover
-      ? "#F5F5F5"
-      : "white",
+      ? "#DEDEDE"
+      : "#F7F7F7",
   });
 
   useEffect(() => {
@@ -94,4 +95,8 @@ export const RemoveButton = styled.button`
   margin-top: ${(props: RemoveButtonProps) => props.marginTop}px;
   margin-right: ${(props: RemoveButtonProps) => props.marginRight}px;
   cursor: pointer;
+`;
+
+export const BigButton = styled(Button)`
+font-size: 20px;
 `;

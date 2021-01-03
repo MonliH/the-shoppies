@@ -43,6 +43,7 @@ export const getFullMovie = async (movieId: omdbId): Promise<FullMovie> => {
     productionCompany: json.Production,
     releaseDate: json.Released,
     runtime: json.Runtime,
+    releaseYear: json.Year,
   };
 
   return Object.fromEntries(

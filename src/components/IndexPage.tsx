@@ -85,6 +85,36 @@ const IndexPage = () => {
   // We use this for a fallback for the logo, so it always shows a trophy (of some sort)
   const [alt, setAlt] = useState(false);
 
+  const addNomination = (movie: Movie) => {
+    // Add this element to the end of the list
+    setModifiedOrder((modifiedOrd) => [
+      ...modifiedOrd,
+      [movie.id, modifiedOrd.length],
+    ]);
+    setNominated((nom) => ({
+      ...nom,
+      [movie.id]: movie,
+    }));
+  };
+
+  const removeNomination = (movieId: string) => {
+    // Remove that value
+    setModifiedOrder((modOrd) => {
+      const idIdx = modOrd.findIndex(([dbId]) => movieId === dbId);
+      const removedIdx = modOrd[idIdx][1];
+
+      return modOrd
+        .filter(([dbId]) => dbId !== movieId)
+        .map(([dbId, idx]) => [dbId, idx > removedIdx ? idx - 1 : idx]);
+    });
+
+    setNominated((nom) => {
+      let newNominated = { ...nom };
+      delete newNominated[movieId];
+      return newNominated;
+    });
+  };
+
   return (
     <CenteredWrapper>
       <NotificationCenter
@@ -102,6 +132,15 @@ const IndexPage = () => {
           // Hide panel
           setShowDetails(false);
         }}
+        onNominate={() => {
+          // Nominate current movie
+          addNomination(details!);
+        }}
+        onRemove={() => {
+          // Nominate current movie
+          removeNomination(details!.id);
+        }}
+        nominated={details !== null && nominations.hasOwnProperty(details.id)}
       />
       <HorizontalWrapper style={{ marginTop: "50px" }}>
         {alt ? <LargeHeading>🏆</LargeHeading> : <></>}
@@ -128,15 +167,7 @@ const IndexPage = () => {
           movies={isOk(search_results) ? search_results : []}
           movieOnInfo={displayMovieInfo}
           movieOnNominate={(movie: Movie) => {
-            // Add this element to the end of the list
-            setModifiedOrder((modifiedOrd) => [
-              ...modifiedOrd,
-              [movie.id, modifiedOrd.length],
-            ]);
-            setNominated((nom) => ({
-              ...nom,
-              [movie.id]: movie,
-            }));
+            addNomination(movie);
           }}
           nominated={nominations}
           nominatedDisabled={nominatedDisabled}
@@ -144,24 +175,9 @@ const IndexPage = () => {
         <Nominations
           movieOnInfo={displayMovieInfo}
           removeOnClick={({ id }) => {
-            // Remove that value
-            setModifiedOrder((modOrd) => {
-              const idIdx = modOrd.findIndex(([dbId]) => id === dbId);
-              const removedIdx = modOrd[idIdx][1];
-
-              return modOrd
-                .filter(([dbId]) => dbId !== id)
-                .map(([dbId, idx]) => [dbId, idx > removedIdx ? idx - 1 : idx]);
-            });
-
-            setNominated((nom) => {
-              let newNominated = { ...nom };
-              delete newNominated[id];
-              return newNominated;
-            });
+            removeNomination(id);
           }}
           modifiedOrder={modifiedOrder}
-          setModifiedOrder={setModifiedOrder}
           nominations={nominations}
         />
       </HorizontalWrapper>

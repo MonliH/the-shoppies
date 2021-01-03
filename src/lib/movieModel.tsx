@@ -2,15 +2,12 @@ export type omdbId = string;
 
 export interface Movie {
   id: omdbId;
-  releaseYear: number;
+  releaseYear: string;
   title: string;
   posterUrl: string;
 }
 
-export interface FullMovie {
-  id: omdbId;
-  title: string;
-  posterUrl: string;
+export interface FullMovie extends Movie {
   actors: string | null;
   ageRating: string | null;
   boxOffice: string | null;

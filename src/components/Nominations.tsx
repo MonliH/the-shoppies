@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useRef, useState, useEffect } from "react";
 import styled from "styled-components";
 import {
   to,
@@ -6,6 +6,7 @@ import {
   useSpring,
   animated,
   useSprings,
+  SpringStartFn,
 } from "react-spring";
 import { useDrag } from "react-use-gesture";
 import { X } from "react-feather";
@@ -29,7 +30,14 @@ interface NominationsProps extends MovieInteraction {
   removeOnClick: (movie: Movie, callback?: () => void) => void;
   nominations: NominationsStore;
   modifiedOrder: ModifiedOrder;
-  setModifiedOrder: (mut: (newVal: ModifiedOrder) => ModifiedOrder) => void;
+}
+
+interface NominationsInnerProps extends NominationsProps {
+  setParentStyle: SpringStartFn<{
+    opacity: number;
+    height: number;
+    width: number;
+  }>;
 }
 
 const NominationsDiv = styled(AnimatedStyledPadding)`
@@ -85,39 +93,95 @@ const adjust = (
         immediate: false,
       };
 
+const instant = (heights: Array<number>) => (index: number) => ({
+  y: heights[index],
+  scale: 1,
+  zIndex: "0",
+  shadow: 1,
+  immediate: true,
+});
+
 const NominationsCards = ({
   removeOnClick,
   movieOnInfo,
   modifiedOrder,
-  setModifiedOrder,
   nominations,
-}: NominationsProps) => {
+  setParentStyle,
+}: NominationsInnerProps) => {
+  const [previousOrder, setPreviousOrder] = useState<ModifiedOrder>([]);
+  const removedMovie = useRef<string>("");
+
+  setParentStyle({
+    opacity: previousOrder.length ? 1 : 0,
+    height:
+      previousOrder.length * totalHeight + (previousOrder.length ? 90 : 0),
+    // 40px of margin
+    width: (previousOrder.length ? cardDimensions.width : 0) + 40,
+  });
+
+  const [springs, setSprings] = useSprings(
+    previousOrder.length,
+    adjust(previousOrder),
+    [previousOrder]
+  );
+
+  useEffect(() => {
+    setSprings(adjust(previousOrder));
+  }, [previousOrder]);
+
   const transition = useTransition(
     modifiedOrder.map(
       ([dbId, idx], _) => [nominations[dbId], idx] as [Movie, number]
     ),
     {
       from: {
-        height: 0,
+        left: -400,
         opacity: 0,
       },
-      enter: {
-        height: cardDimensions.height,
-        opacity: 1,
+      enter: ([movie, idx]) => async (next) => {
+        setPreviousOrder((ord) => [...ord, [movie.id, idx]]);
+        await next({
+          left: 0,
+          opacity: 1,
+        });
       },
-      leave: {
-        height: 0,
-        opacity: 0,
+      leave: ([movie]) => async (next) => {
+        const idIdx = previousOrder.findIndex(([dbId]) => movie.id === dbId);
+        const removedIdx = previousOrder[idIdx][1];
+
+        const newOrder = previousOrder
+          .filter(([id]) => id !== movie.id)
+          .map(
+            ([dbId, idx]) =>
+              [dbId, idx > removedIdx ? idx - 1 : idx] as [omdbId, number]
+          );
+
+        const values = new Array(newOrder.length).fill(0);
+        for (const [idx, [, originalIdx]] of newOrder.entries()) {
+          values[originalIdx] =
+            idx * totalHeight + (idx >= idIdx ? totalHeight : 0);
+        }
+
+        newOrder.push([previousOrder[idIdx][0], newOrder.length]);
+        values.push(idIdx * totalHeight);
+
+        removedMovie.current = movie.id;
+
+        await setSprings(instant(values));
+        setPreviousOrder(newOrder);
+
+        await next({
+          left: -400,
+          opacity: 0,
+        });
+
+        removedMovie.current = "";
+
+        setPreviousOrder(newOrder.slice(0, newOrder.length - 1));
       },
       keys: ([{ id }]: [Movie, number]) => id,
       config: { mass: 1, tension: 170, friction: 26 },
     }
-  );
-
-  const [springs, setSprings] = useSprings(
-    modifiedOrder.length,
-    adjust(modifiedOrder),
-    [modifiedOrder]
   );
 
   const bindGesture = useDrag((props) => {
@@ -145,11 +209,9 @@ const NominationsCards = ({
     };
 
     if (!props.down) {
-      setModifiedOrder((modifiedOrd: ModifiedOrder) =>
-        getNewModifiedOrder(modifiedOrd)
-      );
+      setPreviousOrder((ord) => getNewModifiedOrder(ord));
     } else {
-      getNewModifiedOrder(modifiedOrder);
+      getNewModifiedOrder(previousOrder);
     }
   }, {});
 
@@ -157,6 +219,16 @@ const NominationsCards = ({
     <SelectionsWrapper>
       {transition((style, [movie, idx]) => {
         let props = {};
+
+        const prevIndex = previousOrder.findIndex(([mov]) => mov === movie.id);
+        if (
+          prevIndex !== -1 &&
+          previousOrder[prevIndex][1] !== idx &&
+          removedMovie.current === movie.id
+        ) {
+          idx = previousOrder[prevIndex][1];
+        }
+
         if (springs[idx]) {
           const { zIndex, shadow, y, scale } = springs[idx];
           props = {
@@ -170,11 +242,8 @@ const NominationsCards = ({
             ),
           };
         } else {
-          const y =
-            modifiedOrder.findIndex((val) => val[0] === movie.id) * totalHeight;
-          console.log(y);
           props = {
-            transform: `translate3d(0, ${y}px, 0)`,
+            opacity: 0,
           };
         }
 
@@ -183,8 +252,9 @@ const NominationsCards = ({
             {...bindGesture(idx)}
             style={
               {
-                ...style,
                 ...props,
+                ...style,
+                left: style.left.to((left) => `${left}px`),
               } as any // Again, a bug in react spring: https://github.com/react-spring/react-spring/issues/1102
             }
             key={movie.id}
@@ -215,14 +285,13 @@ const NominationsCards = ({
 };
 
 const Nominations = (props: NominationsProps) => {
-  const len = props.modifiedOrder.length;
   // Make the element invisible if there are no nominations
-  const style = useSpring({
-    opacity: len ? 1 : 0,
-    height: len * totalHeight + (len ? 90 : 0),
+  const [style, set] = useSpring(() => ({
+    opacity: 0,
+    height: 0,
     // 40px of margin
-    width: (len ? cardDimensions.width : 0) + 40,
-  });
+    width: 0,
+  }));
 
   return (
     <NominationsDiv
@@ -232,7 +301,7 @@ const Nominations = (props: NominationsProps) => {
     >
       <Label>Nominated Movies</Label>
       <HelpText>Drag Movies to Rearrange</HelpText>
-      <NominationsCards {...props} />
+      <NominationsCards {...props} setParentStyle={set} />
     </NominationsDiv>
   );
 };
