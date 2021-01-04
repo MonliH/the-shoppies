@@ -168,10 +168,7 @@ export const MovieCard = ({ movie, children, cursor }: MovieCardProps) => {
               ? `${movie.title.slice(0, 30)}...`
               : movie.title}
           </MovieHeading>
-          <DateText>
-            Released in
-            {movie.releaseYear}
-          </DateText>
+          <DateText>Released in {movie.releaseYear}</DateText>
           {children}
         </MovieVW>
       </MovieHW>

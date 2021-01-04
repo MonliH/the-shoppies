@@ -119,7 +119,10 @@ const IndexPage = () => {
         }}
         nominated={
           details !== null &&
-          Object.prototype.hasOwnProperty.call(nominations, details.id)
+          Object.prototype.hasOwnProperty.call(
+            nominations.nominations,
+            details.id
+          )
         }
       />
       <HorizontalWrapper style={{ marginTop: "50px" }}>
