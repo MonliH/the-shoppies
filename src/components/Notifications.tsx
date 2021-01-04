@@ -58,12 +58,10 @@ export interface NotificationValue {
 
 const NotificationCenter = ({
   notifications,
-  setNotifications,
+  removeNotification,
 }: {
   notifications: Array<NotificationValue>;
-  setNotifications: (
-    mutate: (original: Array<NotificationValue>) => Array<NotificationValue>
-  ) => void;
+  removeNotification: (idx: number) => void;
 }) => {
   const [cancelMap] = useState(() => new Map());
   const [refMap] = useState(() => new Map());
@@ -89,10 +87,7 @@ const NotificationCenter = ({
       await next({ opacity: 0 });
       await next({ height: 0 });
     },
-    onRest: (_, item) =>
-      setNotifications((original) =>
-        original.filter(({ id }) => id !== item.item.id)
-      ),
+    onRest: (_, item) => removeNotification(item.item.id),
     config: { tension: 125, friction: 20, precision: 0.1 },
     keys: (item: NotificationValue) => item.id,
   });

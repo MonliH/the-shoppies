@@ -1,24 +1,24 @@
-import React, { useState, useEffect } from "react";
+import React, { useReducer, useState, useEffect } from "react";
 
 import { CenteredWrapper, HorizontalWrapper } from "components/Wrappers";
 import { LargeHeading, NormalText } from "components/Text";
 import SearchBar from "components/SearchBar";
 import MovieResults from "components/MovieResults";
 import AnimatedElement from "components/AnimatedElement";
-import Nominations, {
-  NominationsStore,
-  ModifiedOrder,
-} from "components/Nominations";
-import NotificationCenter, {
-  NotificationValue,
-} from "components/Notifications";
+import Nominations from "components/Nominations";
+import NotificationCenter from "components/Notifications";
 import MovieInfoPopup from "components/MovieInfoPopup";
 
 import useSearch from "hooks/useSearch";
+import useNotifications from "hooks/useNotifications";
 
 import { isOk } from "lib/result";
 import { getFullMovie } from "lib/api";
 import { FullMovie, Movie } from "lib/movieModel";
+
+import nominationReducer, {
+  NominationActionTypes,
+} from "reducers/nominationReducer";
 
 const IndexPage = () => {
   const [query, set_query, search_results] = useSearch();
@@ -35,16 +35,17 @@ const IndexPage = () => {
     }
   }, [search_results, query]);
 
-  const [notifications, setNotifications] = useState<Array<NotificationValue>>(
-    []
-  );
-  const [notificationIdx, setNotificationIdx] = useState(0);
+  const [nominations, nominationsDispatch] = useReducer(nominationReducer, {
+    modifiedOrder: [],
+    nominations: {},
+    nominatedDisabled: false,
+  });
 
-  // List of reorderings
-  const [modifiedOrder, setModifiedOrder] = useState<ModifiedOrder>([]);
-  // Object of movieid to movie for selected objects
-  const [nominations, setNominated] = useState<NominationsStore>({});
-  const [nominatedDisabled, setNominatedDisabled] = useState(false);
+  const [
+    notifications,
+    addNotification,
+    removeNotification,
+  ] = useNotifications();
 
   const [details, setDetails] = useState<FullMovie | null>(null);
   const [showDetails, setShowDetails] = useState<boolean>(false);
@@ -60,66 +61,27 @@ const IndexPage = () => {
   };
 
   useEffect(() => {
-    if (modifiedOrder.length >= 5) {
-      setNominatedDisabled(true);
-      setNotifications((notifications) => {
-        setNotificationIdx((nIdx) => nIdx + 1);
-        return [
-          ...notifications,
-          {
-            id: notificationIdx,
-            message:
-              "You've picked 5 nominations, thanks! Feel free to make make changes to your nominations or rearrange them.",
-            // Make notification last for 5 seconds
-            duration: 5000,
-          },
-        ];
+    if (nominations.nominatedDisabled) {
+      // Add a notification
+      addNotification({
+        message:
+          "You've picked 5 nominations, thanks! Feel free to make make changes to your nominations or rearrange them.",
+        // Make notification last for 5 seconds
+        duration: 5000,
       });
-    } else if (nominatedDisabled) {
-      setNominatedDisabled(false);
     }
-  }, [nominations]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [nominations.nominatedDisabled]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // If set to true, we render the emoji
   // If false, we render the svg logo
   // We use this for a fallback for the logo, so it always shows a trophy (of some sort)
   const [alt, setAlt] = useState(false);
 
-  const addNomination = (movie: Movie) => {
-    // Add this element to the end of the list
-    setModifiedOrder((modifiedOrd) => [
-      ...modifiedOrd,
-      [movie.id, modifiedOrd.length],
-    ]);
-    setNominated((nom) => ({
-      ...nom,
-      [movie.id]: movie,
-    }));
-  };
-
-  const removeNomination = (movieId: string) => {
-    // Remove that value
-    setModifiedOrder((modOrd) => {
-      const idIdx = modOrd.findIndex(([dbId]) => movieId === dbId);
-      const removedIdx = modOrd[idIdx][1];
-
-      return modOrd
-        .filter(([dbId]) => dbId !== movieId)
-        .map(([dbId, idx]) => [dbId, idx > removedIdx ? idx - 1 : idx]);
-    });
-
-    setNominated((nom) => {
-      let newNominated = { ...nom };
-      delete newNominated[movieId];
-      return newNominated;
-    });
-  };
-
   return (
     <CenteredWrapper>
       <NotificationCenter
         notifications={notifications}
-        setNotifications={setNotifications}
+        removeNotification={removeNotification}
       />
       <MovieInfoPopup
         fullInfo={details}
@@ -133,12 +95,16 @@ const IndexPage = () => {
           setShowDetails(false);
         }}
         onNominate={() => {
-          // Nominate current movie
-          addNomination(details!);
+          nominationsDispatch({
+            type: NominationActionTypes.ADD,
+            movie: details!,
+          });
         }}
         onRemove={() => {
-          // Nominate current movie
-          removeNomination(details!.id);
+          nominationsDispatch({
+            type: NominationActionTypes.REMOVE,
+            movieId: details!.id,
+          });
         }}
         nominated={details !== null && nominations.hasOwnProperty(details.id)}
       />
@@ -167,18 +133,21 @@ const IndexPage = () => {
           movies={isOk(search_results) ? search_results : []}
           movieOnInfo={displayMovieInfo}
           movieOnNominate={(movie: Movie) => {
-            addNomination(movie);
+            nominationsDispatch({ type: NominationActionTypes.ADD, movie });
           }}
-          nominated={nominations}
-          nominatedDisabled={nominatedDisabled}
+          nominated={nominations.nominations}
+          nominatedDisabled={nominations.nominatedDisabled}
         />
         <Nominations
           movieOnInfo={displayMovieInfo}
           removeOnClick={({ id }) => {
-            removeNomination(id);
+            nominationsDispatch({
+              type: NominationActionTypes.REMOVE,
+              movieId: id,
+            });
           }}
-          modifiedOrder={modifiedOrder}
-          nominations={nominations}
+          modifiedOrder={nominations.modifiedOrder}
+          nominations={nominations.nominations}
         />
       </HorizontalWrapper>
     </CenteredWrapper>
