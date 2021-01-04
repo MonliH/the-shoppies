@@ -1,5 +1,5 @@
 import React, { CSSProperties, useState, ReactNode } from "react";
-import { useSpring } from "react-spring";
+import { animated } from "react-spring";
 import styled from "styled-components";
 import { CameraOff } from "react-feather";
 
@@ -34,17 +34,15 @@ const MovieFallback = styled(MovieImg).attrs({ as: "div" })`
 `;
 
 const MoviePadding = styled(AnimatedStyledPadding)`
-  position: relative;
-  width: ${cardDimensions.width}px !important;
-  height: ${cardDimensions.height}px !important;
+  width: ${cardDimensions.width}px;
+  height: ${cardDimensions.height}px;
   padding: 15px !important;
   display: flex;
   align-items: center;
   margin: 0;
-  &:hover {
-    cursor: pointer;
-  }
+  overflow: hidden;
 `;
+
 const MovieHW = styled(HorizontalWrapper)`
   align-items: center;
 `;
@@ -98,6 +96,7 @@ interface MovieCardProps {
   movie: Movie;
   cursor?: string;
   children?: ReactNode;
+  otherProps?: React.ComponentProps<typeof animated.div>;
 }
 
 export const MovieImage = ({
@@ -142,19 +141,17 @@ const MovieCardImage = styled(MovieImage)`
   font-size: 18px;
 `;
 
-export const MovieCard = ({ movie, children, cursor }: MovieCardProps) => {
-  const [hover, setHover] = useState(false);
-
-  const style = useSpring({
-    boxShadow: hover ? "5px 3px 10px 5px #F2F2F2" : "5px 3px 7px 1px #F2F2F2",
-    scale: hover ? 1.005 : 1,
-  });
-
+export const MovieCard = ({
+  movie,
+  children,
+  cursor,
+  otherProps,
+}: MovieCardProps) => {
   return (
     <MoviePadding
-      onMouseEnter={() => setHover(true)}
-      onMouseLeave={() => setHover(false)}
-      style={{ ...style, cursor } as any} // Note: a bug in react spring, see MovieResults component for more info
+      // eslint-disable-next-line react/jsx-props-no-spreading
+      {...otherProps}
+      style={{ cursor, ...otherProps?.style } as any} // Note: a bug in react spring, see MovieResults component for more info
     >
       <MovieHW>
         <MovieCardImage

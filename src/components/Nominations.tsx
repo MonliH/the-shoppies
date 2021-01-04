@@ -4,7 +4,6 @@ import {
   to,
   useTransition,
   useSpring,
-  animated,
   useSprings,
   SpringStartFn,
 } from "react-spring";
@@ -51,13 +50,6 @@ const NominationsDiv = styled(AnimatedStyledPadding)`
 
 const HelpText = styled(NormalText)`
   font-size: 14px;
-`;
-
-const CardWrapper = styled(animated.div)`
-  overflow: hidden;
-  position: absolute;
-  top: 0;
-  left: 0;
 `;
 
 const SelectionsWrapper = styled.div`
@@ -272,43 +264,52 @@ const NominationsCards = ({
             ),
             transform: to(
               [y, scale],
+              // Use translate because it is much more performant than setting top
+              // (the 3d part in translate3d speeds up the transitions sometimes
+              // because it uses the GPU, even though we're not setting the z
+              // translation)
               (yp, s) => `translate3d(0, ${yp}px, 0) scale(${s})`
             ),
           };
         }
 
         return (
-          <CardWrapper
-            // eslint-disable-next-line react/jsx-props-no-spreading
-            {...bindGesture(newIdx)}
-            style={
-              {
+          <MovieCard
+            key={movie.id}
+            movie={movie}
+            cursor="grab"
+            otherProps={{
+              ...bindGesture(newIdx),
+              style: {
+                top: 0,
+                left: 0,
+                position: "absolute",
+                padding: 15,
                 ...props,
                 ...style,
                 height: style.height.to((height) => `${height}px`),
-              } as any // Again, a bug in react spring: https://github.com/react-spring/react-spring/issues/1102
-            }
-            key={movie.id}
+              } as any,
+              // The `as any` cast is required because of a bug in react-spring.
+              // See this https://github.com/react-spring/react-spring/issues/1102
+            }}
           >
-            <MovieCard movie={movie} cursor="grab">
-              <Button
-                onClick={() => {
-                  movieOnInfo(movie);
-                }}
-              >
-                More Info
-              </Button>
-              <RemoveButton
-                onClick={() => {
-                  removeOnClick(movie);
-                }}
-                marginTop={7}
-                marginRight={7}
-              >
-                <X size={20} />
-              </RemoveButton>
-            </MovieCard>
-          </CardWrapper>
+            <Button
+              onClick={() => {
+                movieOnInfo(movie);
+              }}
+            >
+              More Info
+            </Button>
+            <RemoveButton
+              onClick={() => {
+                removeOnClick(movie);
+              }}
+              marginTop={7}
+              marginRight={7}
+            >
+              <X size={20} />
+            </RemoveButton>
+          </MovieCard>
         );
       })}
     </SelectionsWrapper>

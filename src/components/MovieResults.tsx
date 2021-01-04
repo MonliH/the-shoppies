@@ -18,7 +18,6 @@ import useWindowDimensions from "hooks/useWindowDimensions";
 const SearchResultsWrapper = styled(animated.div)`
   position: relative;
   margin-top: 20px;
-  flex-shrink: 0 !important;
 `;
 
 interface MoviePosition {
@@ -114,6 +113,7 @@ const MovieResults = ({
     }),
     leave: { height: 0, opacity: 0 },
     keys: (item: MoviePosition) => item.movie.id,
+    config: { mass: 2, tension: 170, friction: 35 },
   });
 
   const fragment = transitions((style, item: MoviePosition) => {
@@ -124,52 +124,52 @@ const MovieResults = ({
     );
 
     return (
-      <animated.div
-        key={item.movie.id}
-        style={
-          {
+      <MovieCard
+        movie={item.movie}
+        otherProps={{
+          style: {
             position: "absolute",
             transform: xy.to(
               (x: number, y: number) => `translate3d(${x}px, ${y}px, 0px)`
             ),
             ...others,
-          } as any
+          } as any,
+
           // The `as any` cast is required because of a bug in react-spring.
           // See this https://github.com/react-spring/react-spring/issues/1102
-        }
+        }}
+        key={item.movie.id}
       >
-        <MovieCard movie={item.movie}>
-          <HorizontalWrapper style={{ marginTop: "2px" }}>
-            <NominateButton
-              onClick={(e) => {
-                // Prevent onclick from being activated on the card, too
-                e.stopPropagation();
-                movieOnNominate(item.movie);
-              }}
-              // Disabled if it's already been nominated, or if everything is disabled
-              // becuase there are over 5 nominations
-              disabled={alreadyNominated || nominatedDisabled}
-              style={{
-                cursor:
-                  alreadyNominated || nominatedDisabled
-                    ? "not-allowed"
-                    : "default",
-                fontWeight:
-                  alreadyNominated || nominatedDisabled ? "normal" : 600,
-              }}
-            >
-              {alreadyNominated ? "Nominated" : "Nominate"}
-            </NominateButton>
-            <Button
-              onClick={() => {
-                movieOnInfo(item.movie);
-              }}
-            >
-              More Info
-            </Button>
-          </HorizontalWrapper>
-        </MovieCard>
-      </animated.div>
+        <HorizontalWrapper style={{ marginTop: "2px" }}>
+          <NominateButton
+            onClick={(e) => {
+              // Prevent onclick from being activated on the card, too
+              e.stopPropagation();
+              movieOnNominate(item.movie);
+            }}
+            // Disabled if it's already been nominated, or if everything is disabled
+            // becuase there are over 5 nominations
+            disabled={alreadyNominated || nominatedDisabled}
+            style={{
+              cursor:
+                alreadyNominated || nominatedDisabled
+                  ? "not-allowed"
+                  : "default",
+              fontWeight:
+                alreadyNominated || nominatedDisabled ? "normal" : 600,
+            }}
+          >
+            {alreadyNominated ? "Nominated" : "Nominate"}
+          </NominateButton>
+          <Button
+            onClick={() => {
+              movieOnInfo(item.movie);
+            }}
+          >
+            More Info
+          </Button>
+        </HorizontalWrapper>
+      </MovieCard>
     );
   });
 
@@ -185,7 +185,7 @@ const MovieResults = ({
     width: movies.length
       ? columns * (cardDimensions.width + cardDimensions.LRMargin)
       : 0,
-    config: { mass: 2, tension: 100, friction: 30 },
+    config: { mass: 3, tension: 130, friction: 50 },
   });
 
   return (
