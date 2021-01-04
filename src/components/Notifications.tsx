@@ -73,7 +73,7 @@ const NotificationCenter = ({
       time: "100%",
     },
     enter: (item) => async (next) =>
-      await next({
+      next({
         opacity: 1,
         height: refMap.get(item.id).offsetHeight,
       }),

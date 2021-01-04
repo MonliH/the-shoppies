@@ -4,6 +4,15 @@ import { Result } from "lib/result";
 const API_KEY = "8c26a0ae";
 const BASE_URL = `http://www.omdbapi.com/?apikey=${API_KEY}&`;
 
+export const getLinkHighRes = (url: string | null): string | undefined =>
+  url?.replace(/^(.*@)(.*)$/, "$1");
+
+export const isEmpty = (item: string): boolean =>
+  item.toLowerCase() === "not rated" || item.toLowerCase() === "n/a";
+
+export const addAnd = (csvs: string | null): string | undefined =>
+  csvs?.replace(/,([^,]*)$/, " and$1");
+
 export const searchMovies = async (
   query: string
 ): Promise<Result<Array<Movie>>> => {
@@ -14,11 +23,11 @@ export const searchMovies = async (
     return json.Error as string;
   }
 
-  return json.Search.map((json: any) => ({
-    id: json.imdbID,
-    releaseYear: Number.parseInt(json.Year),
-    posterUrl: json.Poster,
-    title: json.Title,
+  return json.Search.map((movie: any) => ({
+    id: movie.imdbID,
+    releaseYear: Number.parseInt(movie.Year, 10),
+    posterUrl: movie.Poster,
+    title: movie.Title,
   }));
 };
 
@@ -52,16 +61,4 @@ export const getFullMovie = async (movieId: omdbId): Promise<FullMovie> => {
       isEmpty(value) ? null : value,
     ])
   ) as FullMovie;
-};
-
-export const getLinkHighRes = (url: string | null): string | undefined => {
-  return url?.replace(/^(.*@)(.*)$/, "$1");
-};
-
-export const isEmpty = (item: string): boolean => {
-  return item.toLowerCase() === "not rated" || item.toLowerCase() === "n/a";
-};
-
-export const addAnd = (csvs: string | null): string | undefined => {
-  return csvs?.replace(/,([^,]*)$/, " and$1");
 };

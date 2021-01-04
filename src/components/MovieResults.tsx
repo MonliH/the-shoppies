@@ -2,10 +2,13 @@ import React from "react";
 import { animated, useTransition, useSpring } from "react-spring";
 import styled from "styled-components";
 
-import MovieCard, { MovieInteraction } from "components/MovieCard";
+import MovieCard, {
+  MovieInteraction,
+  cardDimensions,
+} from "components/MovieCard";
 import { Button } from "components/Widget";
 import { HorizontalWrapper } from "components/Wrappers";
-import { cardDimensions } from "components/MovieCard";
+
 import { NominationsStore } from "components/Nominations";
 
 import { Movie } from "lib/movieModel";
@@ -66,13 +69,13 @@ const MovieResults = ({
   let counterRow = 0;
 
   // Calculate positions of each movie preview
-  let gridItems: Array<MoviePosition> = movies.map((child, i) => {
-    counterCol++;
+  const gridItems: Array<MoviePosition> = movies.map((child, i) => {
+    counterCol += 1;
 
     if (i % columns === 0) {
       if (i !== 0) {
         // New row
-        counterRow++;
+        counterRow += 1;
       }
       // Reset column
       counterCol = 0;
@@ -114,8 +117,11 @@ const MovieResults = ({
   });
 
   const fragment = transitions((style, item: MoviePosition) => {
-    let { xy, ...others } = style;
-    const alreadyNominated = nominated.hasOwnProperty(item.movie.id);
+    const { xy, ...others } = style;
+    const alreadyNominated = Object.prototype.hasOwnProperty.call(
+      nominated,
+      item.movie.id
+    );
 
     return (
       <animated.div

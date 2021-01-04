@@ -1,6 +1,5 @@
 import { NominationsStore, ModifiedOrder } from "components/Nominations";
 import { Movie } from "lib/movieModel";
-import { assertUnreachable } from "lib/never";
 
 export const nominationsInitialState = {
   modifiedOrder: [],
@@ -28,6 +27,7 @@ type NominationsAction =
 const nominationReducer = (
   state: NominationsState,
   action: NominationsAction
+  // eslint-disable-next-line consistent-return
 ): NominationsState => {
   switch (action.type) {
     case NominationActionTypes.ADD:
@@ -41,14 +41,14 @@ const nominationReducer = (
         // n - 1 length because an element is being added
         nominatedDisabled: state.modifiedOrder.length >= 4,
       };
-    case NominationActionTypes.REMOVE:
+    case NominationActionTypes.REMOVE: {
       const idIdx = state.modifiedOrder.findIndex(
         ([dbId]) => action.movieId === dbId
       );
       const removedIdx = state.modifiedOrder[idIdx][1];
 
       // Copy the nominations
-      let newNominations = { ...state.nominations };
+      const newNominations = { ...state.nominations };
       // And remove the element
       delete newNominations[action.movieId];
 
@@ -64,8 +64,8 @@ const nominationReducer = (
         nominations: newNominations,
         nominatedDisabled: newModifiedOrder.length >= 5,
       };
+    }
+    // All cases specified
   }
-
-  assertUnreachable(action);
 };
 export default nominationReducer;

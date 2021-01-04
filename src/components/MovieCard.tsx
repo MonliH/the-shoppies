@@ -154,7 +154,7 @@ export const MovieCard = ({ movie, children, cursor }: MovieCardProps) => {
     <MoviePadding
       onMouseEnter={() => setHover(true)}
       onMouseLeave={() => setHover(false)}
-      style={{ ...style, cursor: cursor } as any} // Note: a bug in react spring, see MovieResults component for more info
+      style={{ ...style, cursor } as any} // Note: a bug in react spring, see MovieResults component for more info
     >
       <MovieHW>
         <MovieCardImage
@@ -168,7 +168,10 @@ export const MovieCard = ({ movie, children, cursor }: MovieCardProps) => {
               ? `${movie.title.slice(0, 30)}...`
               : movie.title}
           </MovieHeading>
-          <DateText>Released in {movie.releaseYear}</DateText>
+          <DateText>
+            Released in
+            {movie.releaseYear}
+          </DateText>
           {children}
         </MovieVW>
       </MovieHW>

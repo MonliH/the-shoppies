@@ -44,21 +44,18 @@ interface ButtonProps extends React.HTMLAttributes<HTMLButtonElement> {
 export const Button = ({
   children,
   disabled,
-  hoverColor,
+  hoverColor = ["#EFEFEF", "#F9F9F9"],
+  style,
   ...props
 }: ButtonProps) => {
   const [hover, setHover] = useState<boolean>(false);
 
-  const style = useSpring({
-    backgroundColor: hoverColor
-      ? hover || disabled
-        ? hoverColor[1]
-        : hoverColor[0]
-      : hover || disabled
-      ? "#EFEFEF"
-      : "#F9F9F9",
+  const hoverShadow = hover ? 7 : 4;
+
+  const hoverStyles = useSpring({
+    backgroundColor: hover || disabled ? hoverColor[1] : hoverColor[0],
     color: disabled ? "#6A6A6A" : "black",
-    shadow: disabled ? 0.5 : hover ? 7 : 4,
+    shadow: disabled ? 0.5 : hoverShadow,
   });
 
   useEffect(() => {
@@ -72,12 +69,13 @@ export const Button = ({
       disabled={disabled}
       onMouseOver={() => setHover(true)}
       onMouseLeave={() => setHover(false)}
+      // eslint-disable-next-line react/jsx-props-no-spreading
       {...props}
       style={
         {
-          ...props.style,
           ...style,
-          boxShadow: style.shadow.to(
+          ...hoverStyles,
+          boxShadow: hoverStyles.shadow.to(
             (s) => `${s / 2}px ${s / 2}px ${s}px ${s / 4}px #ebebeb`
           ),
         } as any // Again, a bug in react spring: https://github.com/react-spring/react-spring/issues/1102

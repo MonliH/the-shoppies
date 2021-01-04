@@ -65,10 +65,10 @@ const SearchHorizontalWrapper = styled(HorizontalWrapper)`
 `;
 
 const SearchBar = ({
-  set_query,
+  setQuery,
   query,
 }: {
-  set_query: (query: string) => void;
+  setQuery: (query: string) => void;
   query: string;
 }) => {
   const searchBarRef = useRef<HTMLInputElement>(null);
@@ -91,7 +91,7 @@ const SearchBar = ({
             id="searchbar"
             ref={searchBarRef}
             placeholder="e.g. the matrix"
-            onChange={(e) => set_query(e.target.value)}
+            onChange={(e) => setQuery(e.target.value)}
             value={query}
           />
         </SearchHorizontalWrapper>

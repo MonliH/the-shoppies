@@ -118,22 +118,20 @@ const MovieFact = <T,>({
   Icon: React.FC<FeatherIcons.IconProps>;
   value?: T | null;
   notFoundText?: string;
-}) => {
-  return (
-    <MovieFactDiv>
-      <IconWrapper>
-        <Icon size={24} />
-      </IconWrapper>
-      <TextWrapper>
-        {value !== null ? (
-          children
-        ) : (
-          <NormalTextSmall>{notFoundText}</NormalTextSmall>
-        )}
-      </TextWrapper>
-    </MovieFactDiv>
-  );
-};
+}) => (
+  <MovieFactDiv>
+    <IconWrapper>
+      <Icon size={24} />
+    </IconWrapper>
+    <TextWrapper>
+      {value !== null ? (
+        children
+      ) : (
+        <NormalTextSmall>{notFoundText}</NormalTextSmall>
+      )}
+    </TextWrapper>
+  </MovieFactDiv>
+);
 
 const CenteredHorizontalWrapper = styled(HorizontalWrapper)`
   margin-bottom: 10px;
@@ -175,14 +173,14 @@ const MovieInfoPopup = ({
     opacity: visible ? 1 : 0,
     transform: visible ? "translate3d(0, 0, 0)" : "translate3d(0, -100vh, 0)",
     onRest: () => {
-      setDisplay((display) => (visible ? display : "none"));
+      setDisplay((oldDisplay) => (visible ? oldDisplay : "none"));
     },
   });
 
   const backgroundStyle = useSpring({
     opacity: visible ? 1 : 0,
     onStart: () => {
-      setDisplay((display) => (visible ? "flex" : display));
+      setDisplay((oldDisplay) => (visible ? "flex" : oldDisplay));
     },
   });
 
@@ -218,7 +216,7 @@ const MovieInfoPopup = ({
               maxWidth: imageWidth,
 
               minHeight: height,
-              height: height,
+              height,
               maxHeight: height,
             }}
           />
@@ -234,7 +232,7 @@ const MovieInfoPopup = ({
             <MovieFact
               Icon={FeatherIcons.Calendar}
               value={fullInfo.releaseDate}
-              notFoundText={"Date not found"}
+              notFoundText="Date not found"
             >
               <NormalTextSmall>
                 Released on{" "}
@@ -261,7 +259,7 @@ const MovieInfoPopup = ({
               notFoundText="Summary not available"
             >
               <NormalTextSmall>
-                <b>Synopsis</b>: {fullInfo.plot}
+                <b>Synopsis</b>:{fullInfo.plot}
               </NormalTextSmall>
             </MovieFact>
             <MovieFact
@@ -279,7 +277,12 @@ const MovieInfoPopup = ({
               notFoundText="Not ranked on IMDB"
             >
               <NormalTextSmall>
-                Ranked <b>{fullInfo.imdbRating}/10</b> on IMDB{" "}
+                Ranked{" "}
+                <b>
+                  {fullInfo.imdbRating}
+                  /10
+                </b>{" "}
+                on IMDB{" "}
                 {fullInfo.imdbVotes !== null ? (
                   <b>{fullInfo.imdbVotes} votes</b>
                 ) : (
@@ -341,10 +344,8 @@ const MovieInfoPopup = ({
                 Genre
                 {
                   // Make "Genre" plural if the length is greater than one
-                  fullInfo.genre
-                    ? fullInfo.genre.split(",").length > 1
-                      ? "s"
-                      : ""
+                  fullInfo.genre && fullInfo.genre.split(",").length > 1
+                    ? "s"
                     : ""
                 }
                 : <b>{addAnd(fullInfo.genre)}</b>

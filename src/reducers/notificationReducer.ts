@@ -1,7 +1,5 @@
 import { NotificationValue } from "components/Notifications";
 
-import { assertUnreachable } from "lib/never";
-
 export const notificationInitialState = {
   notifications: [],
   idx: 0,
@@ -27,6 +25,7 @@ type NominationsAction =
 const notificationReducer = (
   state: NotificationsStore,
   action: NominationsAction
+  // eslint-disable-next-line consistent-return
 ): NotificationsStore => {
   switch (action.type) {
     case NotificationActionTypes.ADD:
@@ -44,7 +43,7 @@ const notificationReducer = (
           ({ id }) => id !== action.notificationId
         ),
       };
+    // All cases specified
   }
-  assertUnreachable(action);
 };
 export default notificationReducer;

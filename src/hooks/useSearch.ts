@@ -9,19 +9,21 @@ const useSearch = (): [
   (query: string) => void,
   Result<Array<Movie>>
 ] => {
-  const [query, set_query] = useState<string>("");
-  const [results, set_results] = useState<Result<Array<Movie>>>([]);
-  const [timer, setTimer] = useState<null | NodeJS.Timeout>(null);
+  const [query, setQuery] = useState<string>("");
+  const [results, setResults] = useState<Result<Array<Movie>>>([]);
+  const [timer, setTimer] = useState<null | ReturnType<typeof setTimeout>>(
+    null
+  );
 
   useEffect(() => {
     if (!query.length) {
       // Clear results
-      set_results([]);
+      setResults([]);
     } else {
       // Debouncing
       const later = async () => {
         setTimer(null);
-        set_results(await searchMovies(query));
+        setResults(await searchMovies(query));
       };
 
       if (timer) {
@@ -35,11 +37,11 @@ const useSearch = (): [
   useEffect(() => {
     if (!query.length && results.length !== 0) {
       // Clear results when search bar is empty
-      set_results([]);
+      setResults([]);
     }
   }, [results]);
 
-  return [query, set_query, results];
+  return [query, setQuery, results];
 };
 
 export default useSearch;

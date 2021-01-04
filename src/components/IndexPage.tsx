@@ -25,27 +25,24 @@ import notificationReducer, {
 } from "reducers/notificationReducer";
 
 const IndexPage = () => {
-  const [query, set_query, search_results] = useSearch();
+  const [query, setQuery, searchResults] = useSearch();
 
   // For smoother error message fades
   // (edge case during query clear)
-  const [prev_err, set_prev_err] = useState<string>("");
+  const [prevErr, setPrevErr] = useState<string>("");
 
   useEffect(() => {
     if (query !== "") {
-      if (!isOk(search_results)) {
-        set_prev_err(search_results);
+      if (!isOk(searchResults)) {
+        setPrevErr(searchResults);
       }
     }
-  }, [search_results, query]);
+  }, [searchResults, query]);
 
-  const [ nominations, 
-      nominationsDispatch] = useReducer
-      (
+  const [nominations, nominationsDispatch] = useReducer(
     nominationReducer,
 
     nominationsInitialState
-
   );
 
   const [notifications, notificationsDispatch] = useReducer(
@@ -79,12 +76,12 @@ const IndexPage = () => {
         },
       });
     }
-  }, [nominations.nominatedDisabled]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [nominations.nominatedDisabled]);
 
   // If set to true, we render the emoji
   // If false, we render the svg logo
   // We use this for a fallback for the logo, so it always shows a trophy (of some sort)
-  const [alt, setAlt] = useState(false);
+  const [alt, setAlt] = useState(true);
 
   return (
     <CenteredWrapper>
@@ -120,10 +117,21 @@ const IndexPage = () => {
             movieId: details!.id,
           });
         }}
-        nominated={details !== null && nominations.hasOwnProperty(details.id)}
+        nominated={
+          details !== null &&
+          Object.prototype.hasOwnProperty.call(nominations, details.id)
+        }
       />
       <HorizontalWrapper style={{ marginTop: "50px" }}>
-        {alt ? <LargeHeading>🏆</LargeHeading> : <></>}
+        {alt ? (
+          <LargeHeading>
+            <span role="img" aria-label="Trophy Logo">
+              🏆
+            </span>
+          </LargeHeading>
+        ) : (
+          <></>
+        )}
         <img
           alt="Logo"
           onError={() => setAlt(true)}
@@ -136,15 +144,15 @@ const IndexPage = () => {
         <LargeHeading style={{ marginLeft: "25px" }}>The Shoppies</LargeHeading>
       </HorizontalWrapper>
       <NormalText>Nominate your top 5 movies for the Shopies award!</NormalText>
-      <SearchBar set_query={set_query} query={query} />
-      <AnimatedElement height="35px" visible={!isOk(search_results)}>
+      <SearchBar setQuery={setQuery} query={query} />
+      <AnimatedElement height="35px" visible={!isOk(searchResults)}>
         <NormalText>
-          {!isOk(search_results) ? search_results : prev_err}
+          {!isOk(searchResults) ? searchResults : prevErr}
         </NormalText>
       </AnimatedElement>
       <HorizontalWrapper>
         <MovieResults
-          movies={isOk(search_results) ? search_results : []}
+          movies={isOk(searchResults) ? searchResults : []}
           movieOnInfo={displayMovieInfo}
           movieOnNominate={(movie: Movie) => {
             nominationsDispatch({ type: NominationActionTypes.ADD, movie });

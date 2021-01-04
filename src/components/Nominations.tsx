@@ -98,26 +98,23 @@ const adjust = (
           shadow: 1,
           immediate: false,
         };
-  } else {
-    return {
-      y: deleted[index],
-      scale: 1,
-      zIndex: "0",
-      shadow: 1,
-      immediate: false,
-    };
   }
-};
-
-const instant = (heights: Array<number>) => (index: number) => {
   return {
-    y: heights[index],
+    y: deleted[index],
     scale: 1,
     zIndex: "0",
     shadow: 1,
-    immediate: true,
+    immediate: false,
   };
 };
+
+const instant = (heights: Array<number>) => (index: number) => ({
+  y: heights[index],
+  scale: 1,
+  zIndex: "0",
+  shadow: 1,
+  immediate: true,
+});
 
 const NominationsCards = ({
   removeOnClick,
@@ -148,11 +145,11 @@ const NominationsCards = ({
     setSprings(
       adjust(previousOrder, removedMovie.current[1], changing.current)
     );
-  }, [previousOrder]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [previousOrder]);
 
   const transition = useTransition(
     modifiedOrder.map(
-      ([dbId, idx], _) => [nominations[dbId], idx] as [Movie, number]
+      ([dbId, idx]) => [nominations[dbId], idx] as [Movie, number]
     ),
     {
       from: {
@@ -179,11 +176,11 @@ const NominationsCards = ({
 
         const newHeights = new Array(newOrder.length).fill(0);
         const updateHeights = [...newHeights];
-        for (const [idx, [, originalIdx]] of newOrder.entries()) {
+        newOrder.forEach(([, originalIdx], idx) => {
           newHeights[originalIdx] =
             idx * totalHeight + (idx >= idIdx ? totalHeight : 0);
           updateHeights[originalIdx] = idx * totalHeight;
-        }
+        });
 
         newOrder.push([previousOrder[idIdx][0], newOrder.length]);
         newHeights.push(idIdx * totalHeight);
@@ -200,9 +197,7 @@ const NominationsCards = ({
 
         changing.current = false;
 
-        setPreviousOrder((old) => {
-          return old.slice(0, old.length - 1);
-        });
+        setPreviousOrder((old) => old.slice(0, old.length - 1));
         removedMovie.current = ["", []];
       },
       keys: ([{ id }]: [Movie, number]) => id,
@@ -222,7 +217,7 @@ const NominationsCards = ({
         Math.max(Math.round((curIndex * totalHeight + y) / totalHeight), 0),
         modifiedOrd.length - 1
       );
-      let newModifiedOrder = [...modifiedOrd];
+      const newModifiedOrder = [...modifiedOrd];
 
       // Move element at curIndex to curRow;
       const element = newModifiedOrder[curIndex]; // Copy the element
@@ -255,19 +250,21 @@ const NominationsCards = ({
     <SelectionsWrapper>
       {transition((style, [movie, idx]) => {
         let props = {};
+        let newIdx = idx;
 
         const prevIndex = previousOrder.findIndex(([mov]) => mov === movie.id);
         const changedIdx =
           prevIndex !== -1 &&
-          previousOrder[prevIndex][1] !== idx &&
+          previousOrder[prevIndex][1] !== newIdx &&
           removedMovie.current[0] === movie.id;
 
         if (changedIdx) {
-          idx = previousOrder[prevIndex][1];
+          const [, originalIdx] = previousOrder[prevIndex];
+          newIdx = originalIdx;
         }
 
-        if (springs[idx]) {
-          const { zIndex, shadow, y, scale } = springs[idx];
+        if (springs[newIdx]) {
+          const { zIndex, shadow, y, scale } = springs[newIdx];
           props = {
             zIndex,
             boxShadow: shadow.to(
@@ -275,14 +272,15 @@ const NominationsCards = ({
             ),
             transform: to(
               [y, scale],
-              (y, s) => `translate3d(0, ${y}px, 0) scale(${s})`
+              (yp, s) => `translate3d(0, ${yp}px, 0) scale(${s})`
             ),
           };
         }
 
         return (
           <CardWrapper
-            {...bindGesture(idx)}
+            // eslint-disable-next-line react/jsx-props-no-spreading
+            {...bindGesture(newIdx)}
             style={
               {
                 ...props,
@@ -292,7 +290,7 @@ const NominationsCards = ({
             }
             key={movie.id}
           >
-            <MovieCard movie={movie} cursor={"grab"}>
+            <MovieCard movie={movie} cursor="grab">
               <Button
                 onClick={() => {
                   movieOnInfo(movie);
@@ -326,6 +324,8 @@ const Nominations = (props: NominationsProps) => {
     width: 0,
   }));
 
+  const { removeOnClick, nominations, modifiedOrder, movieOnInfo } = props;
+
   return (
     <NominationsDiv
       style={
@@ -334,7 +334,13 @@ const Nominations = (props: NominationsProps) => {
     >
       <Label>Nominated Movies</Label>
       <HelpText>Drag Movies to Rearrange</HelpText>
-      <NominationsCards {...props} setParentStyle={set} />
+      <NominationsCards
+        removeOnClick={removeOnClick}
+        nominations={nominations}
+        modifiedOrder={modifiedOrder}
+        movieOnInfo={movieOnInfo}
+        setParentStyle={set}
+      />
     </NominationsDiv>
   );
 };
