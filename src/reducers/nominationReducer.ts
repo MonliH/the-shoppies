@@ -2,6 +2,12 @@ import { NominationsStore, ModifiedOrder } from "components/Nominations";
 import { Movie } from "lib/movieModel";
 import { assertUnreachable } from "lib/never";
 
+export const nominationsInitialState = {
+  modifiedOrder: [],
+  nominations: {},
+  nominatedDisabled: false,
+};
+
 interface NominationsState {
   // List of reorderings
   modifiedOrder: ModifiedOrder;

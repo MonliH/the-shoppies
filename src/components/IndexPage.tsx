@@ -10,7 +10,6 @@ import NotificationCenter from "components/Notifications";
 import MovieInfoPopup from "components/MovieInfoPopup";
 
 import useSearch from "hooks/useSearch";
-import useNotifications from "hooks/useNotifications";
 
 import { isOk } from "lib/result";
 import { getFullMovie } from "lib/api";
@@ -18,7 +17,12 @@ import { FullMovie, Movie } from "lib/movieModel";
 
 import nominationReducer, {
   NominationActionTypes,
+  nominationsInitialState,
 } from "reducers/nominationReducer";
+import notificationReducer, {
+  NotificationActionTypes,
+  notificationInitialState,
+} from "reducers/notificationReducer";
 
 const IndexPage = () => {
   const [query, set_query, search_results] = useSearch();
@@ -35,17 +39,15 @@ const IndexPage = () => {
     }
   }, [search_results, query]);
 
-  const [nominations, nominationsDispatch] = useReducer(nominationReducer, {
-    modifiedOrder: [],
-    nominations: {},
-    nominatedDisabled: false,
-  });
+  const [nominations, nominationsDispatch] = useReducer(
+    nominationReducer,
+    nominationsInitialState
+  );
 
-  const [
-    notifications,
-    addNotification,
-    removeNotification,
-  ] = useNotifications();
+  const [notifications, notificationsDispatch] = useReducer(
+    notificationReducer,
+    notificationInitialState
+  );
 
   const [details, setDetails] = useState<FullMovie | null>(null);
   const [showDetails, setShowDetails] = useState<boolean>(false);
@@ -63,11 +65,14 @@ const IndexPage = () => {
   useEffect(() => {
     if (nominations.nominatedDisabled) {
       // Add a notification
-      addNotification({
-        message:
-          "You've picked 5 nominations, thanks! Feel free to make make changes to your nominations or rearrange them.",
-        // Make notification last for 5 seconds
-        duration: 5000,
+      notificationsDispatch({
+        type: NotificationActionTypes.ADD,
+        notification: {
+          message:
+            "You've picked 5 nominations, thanks! Feel free to make make changes to your nominations or rearrange them.",
+          // Make notification last for 5 seconds
+          duration: 5000,
+        },
       });
     }
   }, [nominations.nominatedDisabled]); // eslint-disable-line react-hooks/exhaustive-deps
@@ -80,8 +85,13 @@ const IndexPage = () => {
   return (
     <CenteredWrapper>
       <NotificationCenter
-        notifications={notifications}
-        removeNotification={removeNotification}
+        notifications={notifications.notifications}
+        removeNotification={(idx: number) => {
+          notificationsDispatch({
+            type: NotificationActionTypes.REMOVE,
+            notificationId: idx,
+          });
+        }}
       />
       <MovieInfoPopup
         fullInfo={details}
