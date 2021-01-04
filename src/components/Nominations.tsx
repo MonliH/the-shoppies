@@ -131,11 +131,11 @@ const NominationsCards = ({
   const changing = useRef<boolean>(false);
 
   setParentStyle({
-    opacity: previousOrder.length ? 1 : 0,
+    opacity: modifiedOrder.length ? 1 : 0,
     height:
-      previousOrder.length * totalHeight + (previousOrder.length ? 90 : 0),
+      modifiedOrder.length * totalHeight + (modifiedOrder.length ? 90 : 0),
     // 40px of margin
-    width: (previousOrder.length ? cardDimensions.width : 0) + 40,
+    width: (modifiedOrder.length ? cardDimensions.width : 0) + 40,
   });
 
   const [springs, setSprings] = useSprings(
@@ -177,18 +177,20 @@ const NominationsCards = ({
               [dbId, idx > removedIdx ? idx - 1 : idx] as [omdbId, number]
           );
 
-        const values = new Array(newOrder.length).fill(0);
+        const newHeights = new Array(newOrder.length).fill(0);
+        const updateHeights = [...newHeights];
         for (const [idx, [, originalIdx]] of newOrder.entries()) {
-          values[originalIdx] =
+          newHeights[originalIdx] =
             idx * totalHeight + (idx >= idIdx ? totalHeight : 0);
+          updateHeights[originalIdx] = idx * totalHeight;
         }
 
         newOrder.push([previousOrder[idIdx][0], newOrder.length]);
-        values.push(idIdx * totalHeight);
+        newHeights.push(idIdx * totalHeight);
 
-        removedMovie.current = [movie.id, values];
+        removedMovie.current = [movie.id, updateHeights];
         changing.current = true;
-        await setSprings(instant(values));
+        await setSprings(instant(newHeights));
         setPreviousOrder(newOrder);
 
         await next({
