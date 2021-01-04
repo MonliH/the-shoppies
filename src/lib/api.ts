@@ -2,7 +2,8 @@ import { FullMovie, Movie, omdbId } from "lib/movieModel";
 import { Result } from "lib/result";
 
 const API_KEY = "8c26a0ae";
-const BASE_URL = `http://www.omdbapi.com/?apikey=${API_KEY}&`;
+// Fetch url
+const BASE_URL = `//www.omdbapi.com/?apikey=${API_KEY}&`;
 
 export const getLinkHighRes = (url: string | null): string | undefined =>
   url?.replace(/^(.*@)(.*)$/, "$1");
