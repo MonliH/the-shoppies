@@ -113,7 +113,6 @@ const MovieResults = ({
     }),
     leave: { height: 0, opacity: 0 },
     keys: (item: MoviePosition) => item.movie.id,
-    config: { mass: 2, tension: 170, friction: 35 },
   });
 
   const fragment = transitions((style, item: MoviePosition) => {
@@ -185,7 +184,7 @@ const MovieResults = ({
     width: movies.length
       ? columns * (cardDimensions.width + cardDimensions.LRMargin)
       : 0,
-    config: { mass: 3, tension: 130, friction: 50 },
+    config: { mass: 2, tension: 100, friction: 30 },
   });
 
   return (
