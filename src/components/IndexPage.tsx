@@ -39,9 +39,13 @@ const IndexPage = () => {
     }
   }, [search_results, query]);
 
-  const [nominations, nominationsDispatch] = useReducer(
+  const [ nominations, 
+      nominationsDispatch] = useReducer
+      (
     nominationReducer,
+
     nominationsInitialState
+
   );
 
   const [notifications, notificationsDispatch] = useReducer(
