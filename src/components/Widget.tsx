@@ -31,7 +31,6 @@ const ButtonStyle = styled(animated.button)`
   margin-top: 5px;
   background-color: white;
   border: 1px solid #b3b3b3;
-  box-shadow: 2px 2px 5px 1px #ebebeb;
   border-radius: 1px;
   font: 13px ${fontSans};
 `;
@@ -57,8 +56,9 @@ export const Button = ({
         : hoverColor[0]
       : hover || disabled
       ? "#EFEFEF"
-      : "#F7F7F7",
-    color: disabled ? "#474747" : "black",
+      : "#F9F9F9",
+    color: disabled ? "#6A6A6A" : "black",
+    shadow: disabled ? 0.5 : hover ? 7 : 4,
   });
 
   useEffect(() => {
@@ -77,6 +77,9 @@ export const Button = ({
         {
           ...props.style,
           ...style,
+          boxShadow: style.shadow.to(
+            (s) => `${s / 2}px ${s / 2}px ${s}px ${s / 4}px #ebebeb`
+          ),
         } as any // Again, a bug in react spring: https://github.com/react-spring/react-spring/issues/1102
       }
     >
