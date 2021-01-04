@@ -42,28 +42,35 @@ const nominationReducer = (
         nominatedDisabled: state.modifiedOrder.length >= 4,
       };
     case NominationActionTypes.REMOVE: {
-      const idIdx = state.modifiedOrder.findIndex(
-        ([dbId]) => action.movieId === dbId
-      );
-      const removedIdx = state.modifiedOrder[idIdx][1];
-
-      // Copy the nominations
-      const newNominations = { ...state.nominations };
-      // And remove the element
-      delete newNominations[action.movieId];
-
-      const newModifiedOrder = state.modifiedOrder
-        .filter(([dbId]) => dbId !== action.movieId)
-        .map(
-          ([dbId, idx]) =>
-            [dbId, idx > removedIdx ? idx - 1 : idx] as [string, number]
+      if (
+        Object.prototype.hasOwnProperty.call(state.nominations, action.movieId)
+      ) {
+        const idIdx = state.modifiedOrder.findIndex(
+          ([dbId]) => action.movieId === dbId
         );
+        const removedIdx = state.modifiedOrder[idIdx][1];
 
-      return {
-        modifiedOrder: newModifiedOrder,
-        nominations: newNominations,
-        nominatedDisabled: newModifiedOrder.length >= 5,
-      };
+        // Copy the nominations
+        const newNominations = { ...state.nominations };
+        // And remove the element
+        delete newNominations[action.movieId];
+
+        const newModifiedOrder = state.modifiedOrder
+          .filter(([dbId]) => dbId !== action.movieId)
+          .map(
+            ([dbId, idx]) =>
+              [dbId, idx > removedIdx ? idx - 1 : idx] as [string, number]
+          );
+
+        return {
+          modifiedOrder: newModifiedOrder,
+          nominations: newNominations,
+          nominatedDisabled: newModifiedOrder.length >= 5,
+        };
+      }
+      // This key has already been removed, the user is spamming the remove button
+      // Return state as it is
+      return state;
     }
     // All cases specified
   }
