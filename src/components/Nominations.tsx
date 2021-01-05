@@ -1,12 +1,6 @@
 import React, { useRef, useState, useEffect } from "react";
 import styled from "styled-components";
-import {
-  to,
-  useTransition,
-  useSpring,
-  useSprings,
-  animated,
-} from "react-spring";
+import { to, useTransition, useSpring, useSprings } from "react-spring";
 import { useDrag } from "react-use-gesture";
 import { X } from "react-feather";
 
@@ -17,8 +11,7 @@ import MovieCard, {
   MovieInteraction,
 } from "components/MovieCard";
 import { Button, AnimatedStyledPadding, RemoveButton } from "components/Widget";
-import { Label, NormalText, NormalTextSmall } from "components/Text";
-import { HorizontalWrapper } from "components/Wrappers";
+import { Label, NormalText } from "components/Text";
 
 export interface NominationsStore {
   [id: string]: Movie;
@@ -243,7 +236,7 @@ const NominationsCards = ({
               // (the 3d part in translate3d speeds up the transitions sometimes
               // because it uses the GPU, even though we're not setting the z
               // translation)
-              (yp, s) => `translate3d(10px, ${yp}px, 0) scale(${s})`
+              (yp, s) => `translate3d(0px, ${yp}px, 0) scale(${s})`
             ),
           };
         }
@@ -291,48 +284,6 @@ const NominationsCards = ({
   );
 };
 
-const MovieRankNumber = animated(styled(NormalTextSmall)`
-  display: block;
-  margin: 0;
-  padding-top: 3px;
-  font-size: 13px;
-  font-weight: 600;
-`);
-
-const NominationsNumbers = ({ length }: { length: number }) => {
-  const orderNumbers = Array.from(Array(length).keys());
-  const hidden = { opacity: 0, height: 0 };
-  const transition = useTransition(orderNumbers, {
-    from: hidden,
-    enter: { opacity: 1, height: totalHeight },
-    leave: hidden,
-    keys: (idx: number) => idx,
-  });
-
-  return (
-    <div>
-      {transition((style, idx) => {
-        return (
-          <MovieRankNumber style={{ ...style } as any}>
-            {idx + 1}.
-          </MovieRankNumber>
-        );
-      })}
-    </div>
-  );
-};
-
-const NumbersWrapper = styled(HorizontalWrapper)`
-  margin: 0;
-  width: ${21 + cardDimensions.width}px;
-`;
-
-const LabelWrapper = styled.div`
-  margin: 0;
-  margin-left: 21px;
-  width: ${cardDimensions.width}px;
-`;
-
 const NominationsDiv = styled(AnimatedStyledPadding)`
   background-color: #f0f0f0;
   width: 0px;
@@ -340,13 +291,6 @@ const NominationsDiv = styled(AnimatedStyledPadding)`
   margin-top: 20px;
   /* Hide because we're animating width */
   overflow: hidden;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-`;
-
-const InnerWrapper = styled.div`
-  margin-left: -6px;
 `;
 
 const Nominations = ({
@@ -359,10 +303,10 @@ const Nominations = ({
   const style = useSpring({
     opacity: modifiedOrder.length ? 1 : 0,
     height:
-      modifiedOrder.length * totalHeight + (modifiedOrder.length ? 130 : 0),
+      modifiedOrder.length * totalHeight + (modifiedOrder.length ? 90 : 0),
     width:
       (modifiedOrder.length ? cardDimensions.width : 0) +
-      (modifiedOrder.length ? 60 : 0), // 75px of margin
+      (modifiedOrder.length ? 40 : 0), // 40px of margin
   });
 
   return (
@@ -371,21 +315,14 @@ const Nominations = ({
         style as any // Again, a bug in react spring: https://github.com/react-spring/react-spring/issues/1102
       }
     >
-      <InnerWrapper>
-        <LabelWrapper>
-          <Label>Nominated Movies</Label>
-          <HelpText>Drag Movies to Rearrange</HelpText>
-        </LabelWrapper>
-        <NumbersWrapper>
-          <NominationsNumbers length={modifiedOrder.length} />
-          <NominationsCards
-            removeOnClick={removeOnClick}
-            nominations={nominations}
-            modifiedOrder={modifiedOrder}
-            movieOnInfo={movieOnInfo}
-          />
-        </NumbersWrapper>
-      </InnerWrapper>
+      <Label>Nominated Movies</Label>
+      <HelpText>Drag Movies to Rearrange</HelpText>
+      <NominationsCards
+        removeOnClick={removeOnClick}
+        nominations={nominations}
+        modifiedOrder={modifiedOrder}
+        movieOnInfo={movieOnInfo}
+      />
     </NominationsDiv>
   );
 };
