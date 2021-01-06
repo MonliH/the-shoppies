@@ -8,6 +8,7 @@ import AnimatedElement from "components/AnimatedElement";
 import Nominations from "components/Nominations";
 import NotificationCenter from "components/Notifications";
 import MovieInfoPopup from "components/MovieInfoPopup";
+import PageChanger from "components/PageChanger";
 
 import useSearch from "hooks/useSearch";
 
@@ -23,25 +24,37 @@ import notificationReducer, {
   NotificationActionTypes,
   notificationInitialState,
 } from "reducers/notificationReducer";
+import searchReducer, {
+  SearchActionTypes,
+  searchInitialState,
+} from "reducers/searchReducer";
 
 const IndexPage = () => {
-  const [query, setQuery, searchResults] = useSearch();
+  const [searchState, searchDispatch] = useReducer(
+    searchReducer,
+    searchInitialState
+  );
+
+  const searchResults = useSearch(
+    searchState.query,
+    searchState.dateFilter,
+    searchState.pageNumber
+  );
 
   // For smoother error message fades
   // (edge case during query clear)
   const [prevErr, setPrevErr] = useState<string>("");
 
   useEffect(() => {
-    if (query !== "") {
+    if (searchState.query !== "") {
       if (!isOk(searchResults)) {
         setPrevErr(searchResults);
       }
     }
-  }, [searchResults, query]);
+  }, [searchResults, searchState.query]);
 
   const [nominations, nominationsDispatch] = useReducer(
     nominationReducer,
-
     nominationsInitialState
   );
 
@@ -147,15 +160,35 @@ const IndexPage = () => {
         <LargeHeading style={{ marginLeft: "25px" }}>The Shoppies</LargeHeading>
       </HorizontalWrapper>
       <NormalText>Nominate your top 5 movies for the Shopies award!</NormalText>
-      <SearchBar setQuery={setQuery} query={query} />
+      <SearchBar
+        setQuery={(q: string) => {
+          searchDispatch({ type: SearchActionTypes.SET_QUERY, query: q });
+        }}
+        query={searchState.query}
+      />
       <AnimatedElement height="35px" visible={!isOk(searchResults)}>
         <NormalText>
           {!isOk(searchResults) ? searchResults : prevErr}
         </NormalText>
       </AnimatedElement>
+      <AnimatedElement
+        height="35px"
+        visible={isOk(searchResults) && searchResults[0].length !== 0}
+      >
+        <PageChanger
+          onNextPage={() => {
+            searchDispatch({ type: SearchActionTypes.NEXT_PAGE });
+          }}
+          onPreviousPage={() => {
+            searchDispatch({ type: SearchActionTypes.PREVIOUS_PAGE });
+          }}
+          currentPage={searchState.pageNumber}
+          totalPages={!isOk(searchResults) ? 0 : searchResults[1]}
+        />
+      </AnimatedElement>
       <HorizontalWrapper>
         <MovieResults
-          movies={isOk(searchResults) ? searchResults : []}
+          movies={isOk(searchResults) ? searchResults[0] : []}
           movieOnInfo={displayMovieInfo}
           movieOnNominate={(movie: Movie) => {
             nominationsDispatch({ type: NominationActionTypes.ADD, movie });

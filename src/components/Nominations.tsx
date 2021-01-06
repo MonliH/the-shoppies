@@ -246,6 +246,9 @@ const NominationsCards = ({
             key={movie.id}
             movie={movie}
             cursor="grab"
+            headingStyle={{
+              paddingRight: "25px", // This is to give space to the delete button
+            }}
             otherProps={{
               ...bindGesture(newIdx),
               style: {

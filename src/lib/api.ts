@@ -1,6 +1,9 @@
 import { FullMovie, Movie, omdbId } from "lib/movieModel";
 import { Result } from "lib/result";
 
+// Polyfill for URLSearchParams
+import URLSearchParams from "@ungap/url-search-params";
+
 const API_KEY = "8c26a0ae";
 // Fetch url
 const BASE_URL = `//www.omdbapi.com/?apikey=${API_KEY}&`;
@@ -15,21 +18,33 @@ export const addAnd = (csvs: string | null): string | undefined =>
   csvs?.replace(/,([^,]*)$/, " and$1");
 
 export const searchMovies = async (
-  query: string
-): Promise<Result<Array<Movie>>> => {
+  query: string,
+  dateFilter?: string,
+  pageNumber: number = 1
+): Promise<Result<[Array<Movie>, number]>> => {
   // Trim the query because leading and trailing whitespace are evil
-  const res = await fetch(`${BASE_URL}s=${query.trim()}&type=movie`);
+  const params = {
+    s: query.trim(),
+    type: "movie",
+    page: pageNumber.toString(),
+    ...(dateFilter ? { dateFilter } : {}),
+  };
+  const res = await fetch(BASE_URL + new URLSearchParams(params));
+
   const json = await res.json();
   if (json.Response && json.Response !== "True") {
     return json.Error as string;
   }
 
-  return json.Search.map((movie: any) => ({
-    id: movie.imdbID,
-    releaseYear: Number.parseInt(movie.Year, 10),
-    posterUrl: movie.Poster,
-    title: movie.Title,
-  }));
+  return [
+    json.Search.map((movie: any) => ({
+      id: movie.imdbID,
+      releaseYear: Number.parseInt(movie.Year, 10),
+      posterUrl: movie.Poster,
+      title: movie.Title,
+    })),
+    Number.parseInt(json.totalResults, 10),
+  ];
 };
 
 export const getFullMovie = async (movieId: omdbId): Promise<FullMovie> => {

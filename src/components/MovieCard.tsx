@@ -97,6 +97,7 @@ interface MovieCardProps {
   cursor?: string;
   children?: ReactNode;
   otherProps?: React.ComponentProps<typeof animated.div>;
+  headingStyle?: React.CSSProperties;
 }
 
 export const MovieImage = ({
@@ -146,6 +147,7 @@ export const MovieCard = ({
   children,
   cursor,
   otherProps,
+  headingStyle,
 }: MovieCardProps) => {
   return (
     <MoviePadding
@@ -160,7 +162,7 @@ export const MovieCard = ({
           iconSize={20}
         />
         <MovieVW>
-          <MovieHeading>
+          <MovieHeading style={headingStyle}>
             {movie.title.length > 40
               ? `${movie.title.slice(0, 30)}...`
               : movie.title}
