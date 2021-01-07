@@ -10,7 +10,7 @@ const SearchBarInput = styled.input`
   /* We don't want it to be too long */
   max-width: 700px;
   /* Make it look good on mobile */
-  media (max-width: 550px) {
+  @media (max-width: 550px) {
     width: 80vw;
   }
 

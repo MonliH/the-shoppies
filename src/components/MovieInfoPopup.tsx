@@ -70,6 +70,10 @@ const Popup = styled(animated.div)`
   background-color: ${(props) => props.theme.backgroundTwo};
 
   border-radius: 4px;
+
+  @media (max-width: 1065px) {
+    max-width: 95vw;
+  }
 `;
 
 const MovieInfoImage = styled(MovieImage)`
@@ -106,6 +110,16 @@ const FactsWrapper = styled(VerticalWrapper)`
   max-height: calc(80vh - 80px);
   overflow-x: hidden;
   overflow-y: auto;
+
+  @media (max-width: 917px) {
+    max-height: none;
+  }
+`;
+
+const PopupHorizontalWrapper = styled(FullHorizontalWrapper)`
+  @media (max-width: 917px) {
+    overflow-y: scroll;
+  }
 `;
 
 const MovieFact = <T,>({
@@ -205,7 +219,7 @@ const MovieInfoPopup = ({
         onClick={onClose}
       />
       <Popup style={popupStyle as any}>
-        <FullHorizontalWrapper>
+        <PopupHorizontalWrapper breakpoint="917px">
           <MovieInfoImage
             url={getLinkHighRes(fullInfo.posterUrl)}
             fallbackTitle={fullInfo.title}
@@ -352,7 +366,7 @@ const MovieInfoPopup = ({
               </NormalTextSmall>
             </MovieFact>
           </FactsWrapper>
-        </FullHorizontalWrapper>
+        </PopupHorizontalWrapper>
         <RemoveButton onClick={onClose} marginTop={21} marginRight={16}>
           <FeatherIcons.X size={23} color="black" />
         </RemoveButton>

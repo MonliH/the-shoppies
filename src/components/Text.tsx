@@ -15,7 +15,6 @@ export const LargeHeading = styled.h1`
   color: #262626;
 
   margin: 0;
-  margin-bottom: 10px;
 `;
 
 export const MediumHeading = styled.h2`

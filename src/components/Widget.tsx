@@ -1,4 +1,4 @@
-import React, { ReactNode, useState, useEffect } from "react";
+import React, { HTMLAttributes, ReactNode, useState, useEffect } from "react";
 import styled from "styled-components";
 import { animated, useSpring } from "react-spring";
 
@@ -35,7 +35,7 @@ const ButtonStyle = styled(animated.button)`
   font: 13px ${fontSans};
 `;
 
-interface ButtonProps extends React.HTMLAttributes<HTMLButtonElement> {
+interface ButtonProps extends HTMLAttributes<HTMLButtonElement> {
   children: ReactNode;
   disabled?: boolean;
   hoverColor?: [string, string];

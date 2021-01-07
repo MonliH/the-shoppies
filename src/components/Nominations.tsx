@@ -59,7 +59,7 @@ const adjust = (
           shadow: 15,
           // We don't need to update y because it's dealt with by react-use-gesture
           // We don't need to animate z-index either
-          immediate: (n: string) => n === "y" || n === "zIndex",
+          immediate: (prop: string) => prop === "y" || prop === "zIndex",
         }
       : {
           y: order.findIndex(([, idx]) => idx === index) * totalHeight,
@@ -69,6 +69,7 @@ const adjust = (
           immediate: false,
         };
   }
+
   return {
     y: deleted[index],
     scale: 1,
@@ -164,6 +165,8 @@ const NominationsCards = ({
         await next({
           height: 0,
           opacity: 0,
+          zIndex: "-1",
+          immediate: (prop) => prop === "zIndex",
         });
 
         changing.current = false;

@@ -1,6 +1,11 @@
 import React, { useReducer, useState, useEffect } from "react";
+import styled from "styled-components";
 
-import { CenteredWrapper, HorizontalWrapper } from "components/Wrappers";
+import {
+  CenteredWrapper,
+  CenteredHorizontalWrapper,
+  HorizontalWrapper,
+} from "components/Wrappers";
 import { LargeHeading, NormalText } from "components/Text";
 import SearchBar from "components/SearchBar";
 import MovieResults from "components/MovieResults";
@@ -29,6 +34,26 @@ import searchReducer, {
   SearchActionTypes,
   searchInitialState,
 } from "reducers/searchReducer";
+
+const HeadingNormalText = styled(NormalText)`
+  text-align: center;
+  @media (max-width: 700px) {
+    width: 80vw;
+    font-size: 18px;
+  }
+`;
+
+const HeadingLogo = styled.img`
+  width: 62px;
+  height: 62px;
+  margin-right: 25px;
+
+  @media (max-width: 700px) {
+    width: 40px;
+    height: 40px;
+    margin-right: 15px;
+  }
+`;
 
 const IndexPage = () => {
   const [searchState, searchDispatch] = useReducer(
@@ -143,9 +168,9 @@ const IndexPage = () => {
           )
         }
       />
-      <HorizontalWrapper style={{ marginTop: "50px" }}>
+      <CenteredHorizontalWrapper style={{ marginBottom: "10px" }}>
         {alt ? (
-          <LargeHeading>
+          <LargeHeading style={{ marginRight: "25px" }}>
             <span role="img" aria-label="Trophy Logo">
               🏆
             </span>
@@ -153,18 +178,18 @@ const IndexPage = () => {
         ) : (
           <></>
         )}
-        <img
+        <HeadingLogo
           alt="Logo"
           onError={() => setAlt(true)}
           onLoad={() => setAlt(false)}
           style={{ display: alt ? "none" : "block" }}
           src="/logo192.png"
-          width={62}
-          height={62}
         />
-        <LargeHeading style={{ marginLeft: "25px" }}>The Shoppies</LargeHeading>
-      </HorizontalWrapper>
-      <NormalText>Nominate your top 5 movies for the Shopies award!</NormalText>
+        <LargeHeading>The Shoppies</LargeHeading>
+      </CenteredHorizontalWrapper>
+      <HeadingNormalText>
+        Nominate your top 5 movies for the Shopies award!
+      </HeadingNormalText>
       <SearchBar
         setQuery={(q: string) => {
           searchDispatch({ type: SearchActionTypes.SET_QUERY, query: q });
