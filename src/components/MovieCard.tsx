@@ -8,6 +8,7 @@ import { SmallHeading, NormalText } from "components/Text";
 import { AnimatedStyledPadding } from "components/Widget";
 
 import { Movie } from "lib/movieModel";
+import Without from "lib/without";
 
 // Card width
 export const cardDimensions = {
@@ -60,6 +61,11 @@ const MovieHeading = styled(SmallHeading)`
   margin: 0;
   margin-bottom: 3px;
   font-size: 17px;
+  max-width: 100%;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 `;
 
 const MovieImageFallback = ({
@@ -96,7 +102,7 @@ interface MovieCardProps {
   movie: Movie;
   cursor?: string;
   children?: ReactNode;
-  otherProps?: React.ComponentProps<typeof animated.div>;
+  otherProps?: Without<React.ComponentProps<typeof animated.div>, "css">;
   headingStyle?: React.CSSProperties;
 }
 
@@ -153,7 +159,7 @@ export const MovieCard = ({
     <MoviePadding
       // eslint-disable-next-line react/jsx-props-no-spreading
       {...otherProps}
-      style={{ cursor, ...otherProps?.style } as any} // Note: a bug in react spring, see MovieResults component for more info
+      style={{ cursor, ...otherProps?.style } as any} // Note: a bug in react spring
     >
       <MovieHW>
         <MovieCardImage
@@ -162,11 +168,7 @@ export const MovieCard = ({
           iconSize={20}
         />
         <MovieVW>
-          <MovieHeading style={headingStyle}>
-            {movie.title.length > 40
-              ? `${movie.title.slice(0, 30)}...`
-              : movie.title}
-          </MovieHeading>
+          <MovieHeading style={headingStyle}>{movie.title}</MovieHeading>
           <DateText>Released in {movie.releaseYear}</DateText>
           {children}
         </MovieVW>

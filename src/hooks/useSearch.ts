@@ -11,16 +11,19 @@ const defaultResults: [Array<Movie>, number] = [[], 0];
 const useSearch = (
   query: string,
   dateFilter: string,
-  pageNumber: number
+  pageNumber: number,
+  setLoading: (loading: boolean) => void
 ): Result<[Array<Movie>, number]> => {
   const [results, setResults] = useState<Result<[Array<Movie>, number]>>(
     defaultResults
   );
 
   const updateMovies = async () => {
+    setLoading(true);
     const res = (await searchMovies(query, dateFilter, pageNumber)) as Result<
       [Array<Movie>, number]
     >;
+    setLoading(false);
     if (isOk(res)) {
       // If it's not error, convert the number of movies to pages
       setResults([res[0], Math.ceil(res[1] / 10)] as [Array<Movie>, number]);
@@ -36,7 +39,7 @@ const useSearch = (
   const changePageNumber = useDebounce(updateMovies, 200);
 
   useEffect(() => {
-    if (!query.length) {
+    if (query.length === 0) {
       // Clear results
       setResults(defaultResults);
     } else {
@@ -45,14 +48,12 @@ const useSearch = (
   }, [query, dateFilter]);
 
   useEffect(() => {
-    changePageNumber();
+    if (query.length !== 0) changePageNumber();
   }, [pageNumber]);
 
   useEffect(() => {
-    if (!query.length && results.length !== 0) {
-      // Clear results when search bar is empty
-      setResults(defaultResults);
-    }
+    // Clear results when search bar is empty
+    if (query.length === 0 && results.length !== 0) setResults(defaultResults);
   }, [results]);
 
   return results;

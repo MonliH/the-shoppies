@@ -17,7 +17,7 @@ import useWindowDimensions from "hooks/useWindowDimensions";
 
 const SearchResultsWrapper = styled(animated.div)`
   position: relative;
-  margin-top: 20px;
+  margin-top: 5px;
 `;
 
 interface MoviePosition {

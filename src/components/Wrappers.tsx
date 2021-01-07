@@ -23,3 +23,8 @@ export const FullHorizontalWrapper = styled(HorizontalWrapper)`
   height: 100%;
   width: 100%;
 `;
+
+export const CenteredHorizontalWrapper = styled(HorizontalWrapper)`
+  justify-content: center;
+  align-items: center;
+`;

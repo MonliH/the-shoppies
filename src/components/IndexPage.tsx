@@ -38,7 +38,10 @@ const IndexPage = () => {
   const searchResults = useSearch(
     searchState.query,
     searchState.dateFilter,
-    searchState.pageNumber
+    searchState.pageNumber,
+    (loading) => {
+      searchDispatch({ type: SearchActionTypes.SET_LOADING, loading });
+    }
   );
 
   // For smoother error message fades

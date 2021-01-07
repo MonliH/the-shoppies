@@ -133,7 +133,7 @@ const MovieFact = <T,>({
   </MovieFactDiv>
 );
 
-const CenteredHorizontalWrapper = styled(HorizontalWrapper)`
+const MovieHorizontalWrapper = styled(HorizontalWrapper)`
   margin-bottom: 10px;
 `;
 
@@ -221,14 +221,14 @@ const MovieInfoPopup = ({
             }}
           />
           <FactsWrapper ref={ref}>
-            <CenteredHorizontalWrapper>
+            <MovieHorizontalWrapper>
               <MovieHeading>{fullInfo.title}</MovieHeading>
               {nominated ? (
                 <BigButton onClick={onRemove}>Remove</BigButton>
               ) : (
                 <BigButton onClick={onNominate}>Nominate</BigButton>
               )}
-            </CenteredHorizontalWrapper>
+            </MovieHorizontalWrapper>
             <MovieFact
               Icon={FeatherIcons.Calendar}
               value={fullInfo.releaseDate}

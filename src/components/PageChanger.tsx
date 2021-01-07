@@ -24,10 +24,6 @@ const PaginationButton = styled.button`
   height: fit-content;
 `;
 
-const PaginationText = styled(NormalTextSmall)`
-  margin: 0px 5px;
-`;
-
 const PageChanger = ({
   onNextPage,
   onPreviousPage,
@@ -41,9 +37,9 @@ const PageChanger = ({
       <PaginationButton onClick={onPreviousPage} disabled={!hasPreviousPage}>
         <ArrowLeft />
       </PaginationButton>
-      <PaginationText>
+      <NormalTextSmall>
         Page <b>{currentPage}</b> of <b>{totalPages}</b>
-      </PaginationText>
+      </NormalTextSmall>
       <PaginationButton onClick={onNextPage} disabled={!hasNextPage}>
         <ArrowRight />
       </PaginationButton>
