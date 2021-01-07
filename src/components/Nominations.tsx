@@ -256,6 +256,7 @@ const NominationsCards = ({
                 left: 0,
                 position: "absolute",
                 padding: 15,
+                touchAction: "pan-x",
                 ...props,
                 ...style,
                 height: style.height.to((height) => `${height}px`),
