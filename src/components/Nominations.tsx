@@ -1,10 +1,11 @@
-import React, { useRef, useState, useEffect } from "react";
+import React, { useRef, useEffect } from "react";
 import styled from "styled-components";
 import { to, useTransition, useSpring, useSprings } from "react-spring";
 import { useDrag } from "react-use-gesture";
 import { X } from "react-feather";
 
 import { Movie, omdbId } from "lib/movieModel";
+import { usePersistedState } from "hooks/usePersisted";
 
 import MovieCard, {
   cardDimensions,
@@ -91,7 +92,11 @@ const NominationsCards = ({
   modifiedOrder,
   nominations,
 }: NominationsProps) => {
-  const [previousOrder, setPreviousOrder] = useState<ModifiedOrder>([]);
+  const [previousOrder, setPreviousOrder] = usePersistedState<ModifiedOrder>(
+    [],
+    "previousOrder"
+  );
+
   const removedMovie = useRef<[string, Array<number>]>(["", []]);
   const changing = useRef<boolean>(false);
 
@@ -117,7 +122,13 @@ const NominationsCards = ({
         opacity: 0,
       },
       enter: ([movie, idx]) => async (next) => {
-        setPreviousOrder((ord) => [...ord, [movie.id, idx]]);
+        // If the id isn't already in the array
+        if (previousOrder.findIndex(([id]) => id === movie.id) === -1) {
+          setPreviousOrder(
+            (ord: ModifiedOrder) =>
+              [...ord, [movie.id, idx]] as Array<[string, number]>
+          );
+        }
         await next({
           height: cardDimensions.height,
           opacity: 1,

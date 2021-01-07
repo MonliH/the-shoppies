@@ -11,6 +11,7 @@ import MovieInfoPopup from "components/MovieInfoPopup";
 import PageChanger from "components/PageChanger";
 
 import useSearch from "hooks/useSearch";
+import { usePersistedReducer } from "hooks/usePersisted";
 
 import { isOk } from "lib/result";
 import { getFullMovie } from "lib/api";
@@ -56,9 +57,10 @@ const IndexPage = () => {
     }
   }, [searchResults, searchState.query]);
 
-  const [nominations, nominationsDispatch] = useReducer(
+  const [nominations, nominationsDispatch] = usePersistedReducer(
     nominationReducer,
-    nominationsInitialState
+    nominationsInitialState,
+    "nominationsObj"
   );
 
   const [notifications, notificationsDispatch] = useReducer(
