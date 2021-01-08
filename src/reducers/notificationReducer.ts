@@ -5,7 +5,7 @@ export const notificationInitialState = {
   idx: 0,
 };
 
-interface NotificationsStore {
+export interface NotificationsStore {
   idx: number;
   notifications: Array<NotificationValue>;
 }
@@ -15,7 +15,7 @@ export enum NotificationActionTypes {
   REMOVE = 2,
 }
 
-type NominationsAction =
+export type NominationsAction =
   | {
       type: NotificationActionTypes.ADD;
       notification: { message: string; duration: number };

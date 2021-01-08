@@ -5,7 +5,7 @@ export const searchInitialState = {
   loading: false,
 };
 
-interface SearchState {
+export interface SearchState {
   query: string;
   dateFilter: string;
   pageNumber: number;
@@ -20,7 +20,7 @@ export enum SearchActionTypes {
   PREVIOUS_PAGE = 5,
 }
 
-type SearchAction =
+export type SearchAction =
   | { type: SearchActionTypes.SET_QUERY; query: string }
   | { type: SearchActionTypes.SET_DATE_FILTER; dateFilter: string }
   | { type: SearchActionTypes.SET_LOADING; loading: boolean }

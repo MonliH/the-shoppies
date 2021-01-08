@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useRef } from "react";
 import styled from "styled-components";
 import { ArrowLeft, ArrowRight } from "react-feather";
 
@@ -32,13 +32,18 @@ const PageChanger = ({
 }: PageChangerProps) => {
   const hasPreviousPage = currentPage > 1;
   const hasNextPage = currentPage < totalPages;
+  const savedPageNumber = useRef<number>(1);
+  if (totalPages !== 0) {
+    savedPageNumber.current = totalPages;
+  }
+
   return (
     <PageChangerWrapper>
       <PaginationButton onClick={onPreviousPage} disabled={!hasPreviousPage}>
         <ArrowLeft />
       </PaginationButton>
       <NormalTextSmall>
-        Page <b>{currentPage}</b> of <b>{totalPages}</b>
+        Page <b>{currentPage}</b> of <b>{savedPageNumber.current}</b>
       </NormalTextSmall>
       <PaginationButton onClick={onNextPage} disabled={!hasNextPage}>
         <ArrowRight />

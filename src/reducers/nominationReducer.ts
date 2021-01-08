@@ -7,7 +7,7 @@ export const nominationsInitialState = {
   nominatedDisabled: false,
 };
 
-interface NominationsState {
+export interface NominationsState {
   // List of reorderings
   modifiedOrder: ModifiedOrder;
   // Object of movieid to movie for selected objects
@@ -20,7 +20,7 @@ export enum NominationActionTypes {
   REMOVE = 2,
 }
 
-type NominationsAction =
+export type NominationsAction =
   | { type: NominationActionTypes.ADD; movie: Movie }
   | { type: NominationActionTypes.REMOVE; movieId: string };
 

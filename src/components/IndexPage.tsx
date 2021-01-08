@@ -1,19 +1,14 @@
 import React, { useReducer, useState, useEffect } from "react";
-import styled from "styled-components";
 
-import {
-  CenteredWrapper,
-  CenteredHorizontalWrapper,
-  HorizontalWrapper,
-} from "components/Wrappers";
-import { LargeHeading, NormalText } from "components/Text";
+import { CenteredWrapper } from "components/Wrappers";
+import { NormalText } from "components/Text";
 import SearchBar from "components/SearchBar";
-import MovieResults from "components/MovieResults";
 import AnimatedElement from "components/AnimatedElement";
-import Nominations from "components/Nominations";
 import NotificationCenter from "components/Notifications";
 import MovieInfoPopup from "components/MovieInfoPopup";
 import PageChanger from "components/PageChanger";
+import Header from "components/Header";
+import SearchResultLayout from "components/SearchResultLayout";
 
 import useSearch from "hooks/useSearch";
 import { usePersistedReducer } from "hooks/usePersisted";
@@ -34,26 +29,6 @@ import searchReducer, {
   SearchActionTypes,
   searchInitialState,
 } from "reducers/searchReducer";
-
-const HeadingNormalText = styled(NormalText)`
-  text-align: center;
-  @media (max-width: 700px) {
-    width: 80vw;
-    font-size: 18px;
-  }
-`;
-
-const HeadingLogo = styled.img`
-  width: 62px;
-  height: 62px;
-  margin-right: 25px;
-
-  @media (max-width: 700px) {
-    width: 40px;
-    height: 40px;
-    margin-right: 15px;
-  }
-`;
 
 const IndexPage = () => {
   const [searchState, searchDispatch] = useReducer(
@@ -121,11 +96,6 @@ const IndexPage = () => {
     }
   }, [nominations.nominatedDisabled]);
 
-  // If set to true, we render the emoji
-  // If false, we render the svg logo
-  // We use this for a fallback for the logo, so it always shows a trophy (of some sort)
-  const [alt, setAlt] = useState(true);
-
   return (
     <CenteredWrapper>
       <NotificationCenter
@@ -168,28 +138,7 @@ const IndexPage = () => {
           )
         }
       />
-      <CenteredHorizontalWrapper style={{ marginBottom: "10px" }}>
-        {alt ? (
-          <LargeHeading style={{ marginRight: "25px" }}>
-            <span role="img" aria-label="Trophy Logo">
-              🏆
-            </span>
-          </LargeHeading>
-        ) : (
-          <></>
-        )}
-        <HeadingLogo
-          alt="Logo"
-          onError={() => setAlt(true)}
-          onLoad={() => setAlt(false)}
-          style={{ display: alt ? "none" : "block" }}
-          src="/logo192.png"
-        />
-        <LargeHeading>The Shoppies</LargeHeading>
-      </CenteredHorizontalWrapper>
-      <HeadingNormalText>
-        Nominate your top 5 movies for the Shopies award!
-      </HeadingNormalText>
+      <Header />
       <SearchBar
         setQuery={(q: string) => {
           searchDispatch({ type: SearchActionTypes.SET_QUERY, query: q });
@@ -216,28 +165,12 @@ const IndexPage = () => {
           totalPages={!isOk(searchResults) ? 0 : searchResults[1]}
         />
       </AnimatedElement>
-      <HorizontalWrapper>
-        <MovieResults
-          movies={isOk(searchResults) ? searchResults[0] : []}
-          movieOnInfo={displayMovieInfo}
-          movieOnNominate={(movie: Movie) => {
-            nominationsDispatch({ type: NominationActionTypes.ADD, movie });
-          }}
-          nominated={nominations.nominations}
-          nominatedDisabled={nominations.nominatedDisabled}
-        />
-        <Nominations
-          movieOnInfo={displayMovieInfo}
-          removeOnClick={({ id }) => {
-            nominationsDispatch({
-              type: NominationActionTypes.REMOVE,
-              movieId: id,
-            });
-          }}
-          modifiedOrder={nominations.modifiedOrder}
-          nominations={nominations.nominations}
-        />
-      </HorizontalWrapper>
+      <SearchResultLayout
+        nominations={nominations}
+        nominationsDispatch={nominationsDispatch}
+        searchResults={searchResults}
+        displayMovieInfo={displayMovieInfo}
+      />
     </CenteredWrapper>
   );
 };

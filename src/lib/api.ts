@@ -6,7 +6,7 @@ import URLSearchParams from "@ungap/url-search-params";
 
 const API_KEY = "8c26a0ae";
 // Fetch url
-const BASE_URL = `//www.omdbapi.com/?apikey=${API_KEY}&`;
+const BASE_URL = `//www.omdbapi.com/?apikey=${API_KEY}&v=1&`;
 
 export const getLinkHighRes = (url: string | null): string | undefined =>
   url?.replace(/^(.*@)(.*)$/, "$1");
@@ -48,7 +48,12 @@ export const searchMovies = async (
 };
 
 export const getFullMovie = async (movieId: omdbId): Promise<FullMovie> => {
-  const res = await fetch(`${BASE_URL}i=${movieId}&type=movie&plot=full`);
+  const params = {
+    type: "movie",
+    plot: "full",
+    i: movieId,
+  };
+  const res = await fetch(BASE_URL + new URLSearchParams(params));
   const json = await res.json();
 
   const fullMovie = {
