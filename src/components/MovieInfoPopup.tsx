@@ -21,6 +21,8 @@ import { BigButton, RemoveButton } from "components/Widget";
 import { FullMovie } from "lib/movieModel";
 import { getLinkHighRes, addAnd } from "lib/api";
 
+import useDebounce from "hooks/useDebounce";
+
 const PopupContainer = styled.div`
   background: none;
   position: fixed;
@@ -56,7 +58,15 @@ const PopupBackground = styled(animated.div)`
   height: 100vh;
 `;
 
-const Popup = styled(animated.div)`
+const PopupWrapper = styled(animated.div)`
+  position: relative;
+  border-radius: 4px;
+  width: fit-content;
+  height: fit-content;
+  overflow: hidden;
+`;
+
+const Popup = styled.div`
   width: fit-content;
   height: fit-content;
   max-height: 80vh;
@@ -69,10 +79,13 @@ const Popup = styled(animated.div)`
 
   background-color: ${(props) => props.theme.backgroundTwo};
 
-  border-radius: 4px;
-
   @media (max-width: 1065px) {
     max-width: 95vw;
+  }
+
+  @media (max-width: 917px) {
+    overflow-y: scroll;
+    overflow-x: hidden;
   }
 `;
 
@@ -116,12 +129,6 @@ const FactsWrapper = styled(VerticalWrapper)`
   }
 `;
 
-const PopupHorizontalWrapper = styled(FullHorizontalWrapper)`
-  @media (max-width: 917px) {
-    overflow-y: scroll;
-  }
-`;
-
 const MovieFact = <T,>({
   children,
   Icon,
@@ -155,6 +162,24 @@ const MovieHeading = styled(MediumHeading)`
   margin-right: 10px;
   margin-bottom: 0px;
   margin-top: 10px;
+`;
+
+const InfoClose = styled(RemoveButton)`
+  position: absolute;
+  top: 21px;
+  right: 16px;
+
+  color: black;
+  z-index: 26;
+
+  @media (max-width: 917px) {
+    background-color: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(4px);
+    border-radius: 2px;
+    width: 35px;
+    height: 35px;
+    right: 26px;
+  }
 `;
 
 const MovieInfoPopup = ({
@@ -198,17 +223,34 @@ const MovieInfoPopup = ({
     },
   });
 
-  const ref = useRef<HTMLDivElement>(null);
-  const [height, setHeight] = useState<number>(1);
+  const ref = useRef<HTMLDivElement | null>(null);
+  const [[width, height, windowWidth], setHeightWidth] = useState<
+    [number, number, number]
+  >([0, 0, 0]);
+
+  const debounceSetHeight = useDebounce(() => {
+    if (ref?.current?.offsetHeight && ref?.current?.offsetWidth) {
+      const calculatedWidth = ref.current.offsetWidth;
+      const calculatedHeight = ref.current.offsetHeight;
+      if (calculatedHeight !== height && calculatedWidth !== width) {
+        setHeightWidth([calculatedWidth, calculatedHeight, window.innerWidth]);
+      }
+    }
+  }, 300);
 
   useLayoutEffect(() => {
-    if (ref && ref.current) {
-      setHeight(ref.current.offsetHeight + 20);
-    }
-  });
+    debounceSetHeight();
+
+    window.addEventListener("resize", debounceSetHeight);
+    return () => {
+      window.removeEventListener("resize", debounceSetHeight);
+    };
+  }, []);
 
   // Maintain movie aspect ratio
-  const imageWidth = height / 1.583;
+  const largeLayout = windowWidth > 917;
+  const imageWidth = largeLayout ? height / 1.583 : width;
+  const imageHeight = largeLayout ? height : width * 1.583;
 
   // Again, the `as any` casts are needed because of a bug in react spring:
   // https://github.com/react-spring/react-spring/issues/1102
@@ -218,159 +260,168 @@ const MovieInfoPopup = ({
         style={{ ...backgroundStyle } as any}
         onClick={onClose}
       />
-      <Popup style={popupStyle as any}>
-        <PopupHorizontalWrapper breakpoint="917px">
-          <MovieInfoImage
-            url={getLinkHighRes(fullInfo.posterUrl)}
-            fallbackTitle={fullInfo.title}
-            iconSize={64}
-            style={{
-              minWidth: imageWidth,
-              width: imageWidth,
-              maxWidth: imageWidth,
+      <PopupWrapper style={popupStyle as any}>
+        <InfoClose onClick={onClose} marginTop={0} marginRight={0}>
+          <FeatherIcons.X size={23} color={largeLayout ? "black" : "white"} />
+        </InfoClose>
+        <Popup>
+          <FullHorizontalWrapper breakpoint="917px">
+            <MovieInfoImage
+              url={getLinkHighRes(fullInfo.posterUrl)}
+              fallbackTitle={fullInfo.title}
+              iconSize={64}
+              style={{
+                minWidth: imageWidth,
+                width: imageWidth,
+                maxWidth: imageWidth,
 
-              minHeight: height,
-              height,
-              maxHeight: height,
-            }}
-          />
-          <FactsWrapper ref={ref}>
-            <MovieHorizontalWrapper>
-              <MovieHeading>{fullInfo.title}</MovieHeading>
-              {nominated ? (
-                <BigButton onClick={onRemove}>Remove</BigButton>
-              ) : (
-                <BigButton onClick={onNominate}>Nominate</BigButton>
-              )}
-            </MovieHorizontalWrapper>
-            <MovieFact
-              Icon={FeatherIcons.Calendar}
-              value={fullInfo.releaseDate}
-              notFoundText="Date not found"
-            >
-              <NormalTextSmall>
-                Released on{" "}
-                <b>{new Date(fullInfo.releaseDate!).toLocaleDateString()}</b>
-              </NormalTextSmall>
-            </MovieFact>
-            <MovieFact
-              Icon={FeatherIcons.User}
-              value={fullInfo.director}
-              notFoundText="Director not found"
-            >
-              <NormalTextSmall>
-                Directed by <b>{fullInfo.director}</b>
-              </NormalTextSmall>
-            </MovieFact>
-            <MovieFact Icon={FeatherIcons.Users}>
-              <NormalTextSmall>
-                Starring <b>{addAnd(fullInfo.actors)}</b>
-              </NormalTextSmall>
-            </MovieFact>
-            <MovieFact
-              Icon={FeatherIcons.FileText}
-              value={fullInfo.plot}
-              notFoundText="Summary not available"
-            >
-              <NormalTextSmall>
-                <b>Synopsis</b>:{fullInfo.plot}
-              </NormalTextSmall>
-            </MovieFact>
-            <MovieFact
-              Icon={FeatherIcons.Film}
-              value={fullInfo.ageRating}
-              notFoundText="Not rated"
-            >
-              <NormalTextSmall>
-                Rated <b>{fullInfo.ageRating}</b>
-              </NormalTextSmall>
-            </MovieFact>
-            <MovieFact
-              Icon={FeatherIcons.Database}
-              value={fullInfo.imdbRating}
-              notFoundText="Not ranked on IMDB"
-            >
-              <NormalTextSmall>
-                Ranked{" "}
-                <b>
-                  {fullInfo.imdbRating}
-                  /10
-                </b>{" "}
-                on IMDB{" "}
-                {fullInfo.imdbVotes !== null ? (
-                  <b>{fullInfo.imdbVotes} votes</b>
-                ) : (
-                  <></>
-                )}
-              </NormalTextSmall>
-            </MovieFact>
-            <MovieFact
-              Icon={FeatherIcons.Clock}
-              value={fullInfo.runtime}
-              notFoundText="Runtime not available"
-            >
-              <NormalTextSmall>
-                <b>{fullInfo.runtime}</b> long
-              </NormalTextSmall>
-            </MovieFact>
-            <MovieFact
-              Icon={FeatherIcons.DollarSign}
-              value={fullInfo.boxOffice}
-              notFoundText="Box office not available"
-            >
-              <NormalTextSmall>
-                <b>{fullInfo.boxOffice}</b> in Box Office
-              </NormalTextSmall>
-            </MovieFact>
-            <MovieFact
-              Icon={FeatherIcons.Briefcase}
-              value={fullInfo.productionCompany}
-              notFoundText="Producer not available"
-            >
-              <NormalTextSmall>
-                Produced by <b>{addAnd(fullInfo.productionCompany)}</b>
-              </NormalTextSmall>
-            </MovieFact>
-            <MovieFact
-              Icon={FeatherIcons.Flag}
-              value={fullInfo.country}
-              notFoundText="Country not available"
-            >
-              <NormalTextSmall>
-                Produced in <b>{addAnd(fullInfo.country)}</b>
-              </NormalTextSmall>
-            </MovieFact>
-            <MovieFact
-              Icon={FeatherIcons.Globe}
-              value={fullInfo.language}
-              notFoundText="Language not found"
-            >
-              <NormalTextSmall>
-                Spoken in <b>{addAnd(fullInfo.language)}</b>
-              </NormalTextSmall>
-            </MovieFact>
-            <MovieFact
-              Icon={FeatherIcons.Layers}
-              value={fullInfo.genre}
-              notFoundText="No genres found"
-            >
-              <NormalTextSmall>
-                Genre
-                {
-                  // Make "Genre" plural if the length is greater than one
-                  fullInfo.genre && fullInfo.genre.split(",").length > 1
-                    ? "s"
-                    : ""
+                minHeight: imageHeight,
+                height: imageHeight,
+                maxHeight: imageHeight,
+              }}
+            />
+            <FactsWrapper
+              ref={(val) => {
+                if (val && !ref.current) {
+                  ref.current = val;
+                  debounceSetHeight();
                 }
-                : <b>{addAnd(fullInfo.genre)}</b>
-              </NormalTextSmall>
-            </MovieFact>
-          </FactsWrapper>
-        </PopupHorizontalWrapper>
-        <RemoveButton onClick={onClose} marginTop={21} marginRight={16}>
-          <FeatherIcons.X size={23} color="black" />
-        </RemoveButton>
-      </Popup>
+              }}
+            >
+              <MovieHorizontalWrapper>
+                <MovieHeading>{fullInfo.title}</MovieHeading>
+                {nominated ? (
+                  <BigButton onClick={onRemove}>Remove</BigButton>
+                ) : (
+                  <BigButton onClick={onNominate}>Nominate</BigButton>
+                )}
+              </MovieHorizontalWrapper>
+              <MovieFact
+                Icon={FeatherIcons.Calendar}
+                value={fullInfo.releaseDate}
+                notFoundText="Date not found"
+              >
+                <NormalTextSmall>
+                  Released on{" "}
+                  <b>{new Date(fullInfo.releaseDate!).toLocaleDateString()}</b>
+                </NormalTextSmall>
+              </MovieFact>
+              <MovieFact
+                Icon={FeatherIcons.User}
+                value={fullInfo.director}
+                notFoundText="Director not found"
+              >
+                <NormalTextSmall>
+                  Directed by <b>{fullInfo.director}</b>
+                </NormalTextSmall>
+              </MovieFact>
+              <MovieFact Icon={FeatherIcons.Users}>
+                <NormalTextSmall>
+                  Starring <b>{addAnd(fullInfo.actors)}</b>
+                </NormalTextSmall>
+              </MovieFact>
+              <MovieFact
+                Icon={FeatherIcons.FileText}
+                value={fullInfo.plot}
+                notFoundText="Summary not available"
+              >
+                <NormalTextSmall>
+                  <b>Synopsis</b>: {fullInfo.plot}
+                </NormalTextSmall>
+              </MovieFact>
+              <MovieFact
+                Icon={FeatherIcons.Film}
+                value={fullInfo.ageRating}
+                notFoundText="Not rated for age"
+              >
+                <NormalTextSmall>
+                  Rated <b>{fullInfo.ageRating}</b>
+                </NormalTextSmall>
+              </MovieFact>
+              <MovieFact
+                Icon={FeatherIcons.Database}
+                value={fullInfo.imdbRating}
+                notFoundText="Not ranked on IMDB"
+              >
+                <NormalTextSmall>
+                  Ranked{" "}
+                  <b>
+                    {fullInfo.imdbRating}
+                    /10
+                  </b>{" "}
+                  on IMDB{" "}
+                  {fullInfo.imdbVotes !== null ? (
+                    <b>{fullInfo.imdbVotes} votes</b>
+                  ) : (
+                    <></>
+                  )}
+                </NormalTextSmall>
+              </MovieFact>
+              <MovieFact
+                Icon={FeatherIcons.Clock}
+                value={fullInfo.runtime}
+                notFoundText="Runtime not available"
+              >
+                <NormalTextSmall>
+                  <b>{fullInfo.runtime}</b> long
+                </NormalTextSmall>
+              </MovieFact>
+              <MovieFact
+                Icon={FeatherIcons.DollarSign}
+                value={fullInfo.boxOffice}
+                notFoundText="Box office not available"
+              >
+                <NormalTextSmall>
+                  <b>{fullInfo.boxOffice}</b> in Box Office
+                </NormalTextSmall>
+              </MovieFact>
+              <MovieFact
+                Icon={FeatherIcons.Briefcase}
+                value={fullInfo.productionCompany}
+                notFoundText="Producer not available"
+              >
+                <NormalTextSmall>
+                  Produced by <b>{addAnd(fullInfo.productionCompany)}</b>
+                </NormalTextSmall>
+              </MovieFact>
+              <MovieFact
+                Icon={FeatherIcons.Flag}
+                value={fullInfo.country}
+                notFoundText="Country not available"
+              >
+                <NormalTextSmall>
+                  Produced in <b>{addAnd(fullInfo.country)}</b>
+                </NormalTextSmall>
+              </MovieFact>
+              <MovieFact
+                Icon={FeatherIcons.Globe}
+                value={fullInfo.language}
+                notFoundText="Language not found"
+              >
+                <NormalTextSmall>
+                  Spoken in <b>{addAnd(fullInfo.language)}</b>
+                </NormalTextSmall>
+              </MovieFact>
+              <MovieFact
+                Icon={FeatherIcons.Layers}
+                value={fullInfo.genre}
+                notFoundText="No genres found"
+              >
+                <NormalTextSmall>
+                  Genre
+                  {
+                    // Make "Genre" plural if the length is greater than one
+                    fullInfo.genre && fullInfo.genre.split(",").length > 1
+                      ? "s"
+                      : ""
+                  }
+                  : <b>{addAnd(fullInfo.genre)}</b>
+                </NormalTextSmall>
+              </MovieFact>
+            </FactsWrapper>
+          </FullHorizontalWrapper>
+        </Popup>
+      </PopupWrapper>
     </PopupContainer>
   ) : (
     <></>

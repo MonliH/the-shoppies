@@ -1,14 +1,17 @@
 import { useState } from "react";
 
-const useDebounce = (func: () => void, time: number): (() => void) => {
+const useDebounce = <T extends any[]>(
+  func: (...args: T) => void,
+  time: number
+): (() => void) => {
   const [timer, setTimer] = useState<null | ReturnType<typeof setTimeout>>(
     null
   );
 
-  const call = () => {
+  const call = (...args: T) => {
     const later = async () => {
       setTimer(null);
-      func();
+      func(...args);
     };
 
     if (timer) {
