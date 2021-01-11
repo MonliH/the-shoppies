@@ -34,7 +34,7 @@ const nominationReducer = (
 ): SearchState => {
   switch (action.type) {
     case SearchActionTypes.SET_QUERY:
-      return { ...state, query: action.query };
+      return { ...state, query: action.query, pageNumber: 1 };
     case SearchActionTypes.SET_DATE_FILTER:
       return { ...state, dateFilter: action.dateFilter };
     case SearchActionTypes.SET_LOADING:

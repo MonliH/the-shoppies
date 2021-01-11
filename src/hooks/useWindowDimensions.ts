@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import useDebounce from "hooks/useDebounce";
 
 const getWindowDimensions = () => {
   const { innerWidth: width, innerHeight: height } = window;
@@ -8,15 +9,15 @@ const getWindowDimensions = () => {
   };
 };
 
-const useWindowDimensions = () => {
+const useWindowDimensions = (delay = 300) => {
   const [windowDimensions, setWindowDimensions] = useState(
     getWindowDimensions()
   );
+  const handleResize = useDebounce(() => {
+    setWindowDimensions(getWindowDimensions());
+  }, delay);
 
   useEffect(() => {
-    const handleResize = () => {
-      setWindowDimensions(getWindowDimensions());
-    };
     window.addEventListener("resize", handleResize);
 
     // remove on unmount

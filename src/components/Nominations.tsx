@@ -1,6 +1,12 @@
 import React, { useRef, useEffect } from "react";
 import styled from "styled-components";
-import { to, useTransition, useSpring, useSprings } from "react-spring";
+import {
+  to,
+  useTransition,
+  useSpring,
+  useSprings,
+  AnimatedProps,
+} from "react-spring";
 import { useDrag } from "react-use-gesture";
 import { X } from "react-feather";
 
@@ -14,16 +20,18 @@ import MovieCard, {
 import { Button, AnimatedStyledPadding, RemoveButton } from "components/Widget";
 import { Label, NormalText } from "components/Text";
 
-export interface NominationsStore {
-  [id: string]: Movie;
-}
+export type NominationsStore = Record<string, Movie>;
 
 export type ModifiedOrder = Array<[omdbId, number]>;
 
-interface NominationsProps extends MovieInteraction {
+interface NominationsCardsProps extends MovieInteraction {
   removeOnClick: (movie: Movie, callback?: () => void) => void;
   nominations: NominationsStore;
   modifiedOrder: ModifiedOrder;
+}
+
+interface NominationsProps extends NominationsCardsProps {
+  customStyle?: AnimatedProps<HTMLDivElement>["style"];
 }
 
 const HelpText = styled(NormalText)`
@@ -54,7 +62,7 @@ const adjust = (
       index === originalIndex
       ? {
           y: curIndex * totalHeight + y,
-          scale: 1.1,
+          scale: 1.08,
           zIndex: "1",
           shadow: 15,
           // We don't need to update y because it's dealt with by react-use-gesture
@@ -92,7 +100,7 @@ const NominationsCards = ({
   movieOnInfo,
   modifiedOrder,
   nominations,
-}: NominationsProps) => {
+}: NominationsCardsProps) => {
   const [previousOrder, setPreviousOrder] = usePersistedState<ModifiedOrder>(
     [],
     "previousOrder"
@@ -165,8 +173,6 @@ const NominationsCards = ({
         await next({
           height: 0,
           opacity: 0,
-          zIndex: "-1",
-          immediate: (prop) => prop === "zIndex",
         });
 
         changing.current = false;
@@ -179,51 +185,55 @@ const NominationsCards = ({
     }
   );
 
-  const bindGesture = useDrag((props) => {
-    const getNewModifiedOrder = (modifiedOrd: ModifiedOrder) => {
-      const {
-        args,
-        down,
-        movement: [, y],
-      } = props;
-      const curIndex = modifiedOrd.findIndex(([, idx]) => idx === args[0]);
-      const curRow = Math.min(
-        Math.max(Math.round((curIndex * totalHeight + y) / totalHeight), 0),
-        modifiedOrd.length - 1
-      );
-      const newModifiedOrder = [...modifiedOrd];
-
-      // Move element at curIndex to curRow;
-      const element = newModifiedOrder[curIndex]; // Copy the element
-      if (!element) return [];
-      newModifiedOrder.splice(curIndex, 1); // Remove it from the array
-      newModifiedOrder.splice(curRow, 0, element); // Insert at curRow
-
-      setSprings(
-        adjust(
-          newModifiedOrder,
-          removedMovie.current[1],
-          changing.current,
+  const bindGesture = useDrag(
+    (props) => {
+      props.event.stopPropagation();
+      const getNewModifiedOrder = (modifiedOrd: ModifiedOrder) => {
+        const {
+          args,
           down,
-          args[0],
-          curIndex,
-          y
-        )
-      );
-      return newModifiedOrder;
-    };
+          movement: [, y],
+        } = props;
+        const curIndex = modifiedOrd.findIndex(([, idx]) => idx === args[0]);
+        const curRow = Math.min(
+          Math.max(Math.round((curIndex * totalHeight + y) / totalHeight), 0),
+          modifiedOrd.length - 1
+        );
+        const newModifiedOrder = [...modifiedOrd];
 
-    if (!props.down) {
-      setPreviousOrder((ord) => getNewModifiedOrder(ord));
-    } else {
-      getNewModifiedOrder(previousOrder);
-    }
-  }, {});
+        // Move element at curIndex to curRow;
+        const element = newModifiedOrder[curIndex]; // Copy the element
+        if (!element) return [];
+        newModifiedOrder.splice(curIndex, 1); // Remove it from the array
+        newModifiedOrder.splice(curRow, 0, element); // Insert at curRow
+
+        setSprings(
+          adjust(
+            newModifiedOrder,
+            removedMovie.current[1],
+            changing.current,
+            down,
+            args[0],
+            curIndex,
+            y
+          )
+        );
+        return newModifiedOrder;
+      };
+
+      if (!props.down) {
+        setPreviousOrder((ord) => getNewModifiedOrder(ord));
+      } else {
+        getNewModifiedOrder(previousOrder);
+      }
+    },
+    { filterTaps: true, eventOptions: { capture: true } }
+  );
 
   return (
     <SelectionsWrapper>
       {transition((style, [movie, idx]) => {
-        let props = {};
+        let props: Record<string, any> = {};
         let newIdx = idx;
 
         const prevIndex = previousOrder.findIndex(([mov]) => mov === movie.id);
@@ -246,8 +256,8 @@ const NominationsCards = ({
             ),
             transform: to(
               [y, scale],
-              // Use translate because it is much more performant than setting top
-              // (the 3d part in translate3d speeds up the transitions sometimes
+              // Use translate because it is much more performant than setting
+              // top (the 3d part in translate3d speeds up the transitions
               // because it uses the GPU, even though we're not setting the z
               // translation)
               (yp, s) => `translate3d(0px, ${yp}px, 0) scale(${s})`
@@ -271,6 +281,7 @@ const NominationsCards = ({
                 position: "absolute",
                 padding: 15,
                 touchAction: "pan-x",
+                zIndex: removedMovie.current[0] === movie.id ? 20 : 21,
                 ...props,
                 ...style,
                 height: style.height.to((height) => `${height}px`),
@@ -306,31 +317,34 @@ const NominationsDiv = styled(AnimatedStyledPadding)`
   background-color: #f0f0f0;
   width: 0px;
   z-index: 5;
-  margin-top: 20px;
+  margin-top: 5px;
   /* Hide because we're animating width */
   overflow: hidden;
 `;
+
+export const getWidth = (length: number) => {
+  return (length ? cardDimensions.width : 0) + (length ? 40 : 0); // Add 40px of marign
+};
 
 const Nominations = ({
   removeOnClick,
   nominations,
   modifiedOrder,
   movieOnInfo,
+  customStyle,
 }: NominationsProps) => {
   // Make the element invisible if there are no nominations
   const style = useSpring({
     opacity: modifiedOrder.length ? 1 : 0,
     height:
       modifiedOrder.length * totalHeight + (modifiedOrder.length ? 90 : 0),
-    width:
-      (modifiedOrder.length ? cardDimensions.width : 0) +
-      (modifiedOrder.length ? 40 : 0), // 40px of margin
+    width: getWidth(modifiedOrder.length),
   });
 
   return (
     <NominationsDiv
       style={
-        style as any // Again, a bug in react spring: https://github.com/react-spring/react-spring/issues/1102
+        { ...customStyle, ...style } as any // Again, a bug in react spring: https://github.com/react-spring/react-spring/issues/1102
       }
     >
       <Label>Nominated Movies</Label>

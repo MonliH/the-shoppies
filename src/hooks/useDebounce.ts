@@ -1,24 +1,22 @@
-import { useState } from "react";
+import { useRef } from "react";
 
 const useDebounce = <T extends any[]>(
   func: (...args: T) => void,
   time: number
 ): (() => void) => {
-  const [timer, setTimer] = useState<null | ReturnType<typeof setTimeout>>(
-    null
-  );
+  const timer = useRef<null | ReturnType<typeof setTimeout>>(null);
 
   const call = (...args: T) => {
     const later = async () => {
-      setTimer(null);
+      timer.current = null;
       func(...args);
     };
 
-    if (timer) {
-      clearTimeout(timer);
+    if (timer.current) {
+      clearTimeout(timer.current);
     }
 
-    setTimer(setTimeout(later, time));
+    timer.current = setTimeout(later, time);
   };
 
   return call;

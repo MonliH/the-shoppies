@@ -153,7 +153,7 @@ const MovieResults = ({
               cursor:
                 alreadyNominated || nominatedDisabled
                   ? "not-allowed"
-                  : "default",
+                  : "pointer",
               fontWeight:
                 alreadyNominated || nominatedDisabled ? "normal" : 600,
             }}

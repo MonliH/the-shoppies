@@ -17,7 +17,7 @@ const Counter = styled(animated.div)`
 
 const Notification = styled(animated.div)`
   background-color: #1a1a1a;
-  background-color: rgba(0, 0, 0, 0.7);
+  background-color: rgba(0, 0, 0, 0.8);
   backdrop-filter: blur(2px);
   width: 650px;
   position: relative;

@@ -1,10 +1,4 @@
-import React, {
-  ReactNode,
-  useEffect,
-  useState,
-  useRef,
-  useLayoutEffect,
-} from "react";
+import React, { ReactNode, useState, useRef, useLayoutEffect } from "react";
 import styled from "styled-components";
 import { animated, useSpring } from "react-spring";
 import * as FeatherIcons from "react-feather";
@@ -23,7 +17,7 @@ import { getLinkHighRes, addAnd } from "lib/api";
 
 import useDebounce from "hooks/useDebounce";
 
-const PopupContainer = styled.div`
+const PopupContainer = styled(animated.div)`
   background: none;
   position: fixed;
   z-index: 25;
@@ -40,13 +34,17 @@ const PopupContainer = styled.div`
   /* Cover the entire viewport */
   width: 100vw;
   height: 100vh;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
 `;
 
-const PopupBackground = styled(animated.div)`
+export const Background = styled(animated.div)`
   background-color: rgba(0, 0, 0, 0.5);
   backdrop-filter: blur(2px);
 
-  position: absolute;
+  position: fixed;
 
   margin: 0;
   padding: 0;
@@ -178,7 +176,11 @@ const InfoClose = styled(RemoveButton)`
     border-radius: 2px;
     width: 35px;
     height: 35px;
-    right: 26px;
+    right: 20px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 `;
 
@@ -186,42 +188,38 @@ const MovieInfoPopup = ({
   fullInfo,
   visible,
   onClose,
-  onHide,
   onNominate,
   onRemove,
+  onFade,
   nominated,
 }: {
   fullInfo: FullMovie | null;
-  onHide: () => void;
   visible: boolean;
   onClose: () => void;
   onNominate: () => void;
   onRemove: () => void;
+  onFade: () => void;
   nominated: boolean;
 }) => {
-  const [display, setDisplay] = useState("none");
-
-  useEffect(() => {
-    // Clear previous movie so that the image doesn't flash
-    if (display === "none" && !visible) {
-      onHide();
-    }
-  }, [display]);
-
   const popupStyle = useSpring({
     opacity: visible ? 1 : 0,
-    transform: visible ? "translate3d(0, 0, 0)" : "translate3d(0, -100vh, 0)",
+    transform: visible ? 0 : -100,
     onRest: () => {
-      setDisplay((oldDisplay) => (visible ? oldDisplay : "none"));
+      if (!visible) {
+        onFade();
+      }
     },
   });
 
   const backgroundStyle = useSpring({
     opacity: visible ? 1 : 0,
-    onStart: () => {
-      setDisplay((oldDisplay) => (visible ? "flex" : oldDisplay));
-    },
   });
+
+  const display = backgroundStyle.opacity.to((bgOpacity) =>
+    popupStyle.opacity.to((popupOpacity) => {
+      return bgOpacity === 0 && popupOpacity === 0 ? "none" : "flex";
+    })
+  );
 
   const ref = useRef<HTMLDivElement | null>(null);
   const [[width, height, windowWidth], setHeightWidth] = useState<
@@ -252,15 +250,21 @@ const MovieInfoPopup = ({
   const imageWidth = largeLayout ? height / 1.583 : width;
   const imageHeight = largeLayout ? height : width * 1.583;
 
-  // Again, the `as any` casts are needed because of a bug in react spring:
-  // https://github.com/react-spring/react-spring/issues/1102
   return fullInfo ? (
-    <PopupContainer style={{ display }}>
-      <PopupBackground
-        style={{ ...backgroundStyle } as any}
-        onClick={onClose}
-      />
-      <PopupWrapper style={popupStyle as any}>
+    // Again, the `as any` casts are needed because of a bug in react spring:
+    // https://github.com/react-spring/react-spring/issues/1102
+    <PopupContainer style={{ display } as any}>
+      <Background style={{ ...backgroundStyle } as any} onClick={onClose} />
+      <PopupWrapper
+        style={
+          {
+            ...popupStyle,
+            transform: popupStyle.transform.to(
+              (offset) => `translate3d(0, ${offset}vh, 0)`
+            ),
+          } as any
+        }
+      >
         <InfoClose onClick={onClose} marginTop={0} marginRight={0}>
           <FeatherIcons.X size={23} color={largeLayout ? "black" : "white"} />
         </InfoClose>

@@ -33,6 +33,7 @@ const ButtonStyle = styled(animated.button)`
   border: 1px solid #b3b3b3;
   border-radius: 1px;
   font: 13px ${fontSans};
+  cursor: pointer;
 `;
 
 interface ButtonProps extends HTMLAttributes<HTMLButtonElement> {

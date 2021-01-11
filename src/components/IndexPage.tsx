@@ -109,15 +109,9 @@ const IndexPage = () => {
       />
       <MovieInfoPopup
         fullInfo={details}
-        onHide={() => {
-          // Remove details
-          setDetails(null);
-        }}
         visible={showDetails}
-        onClose={() => {
-          // Hide panel
-          setShowDetails(false);
-        }}
+        onFade={() => setDetails(null)}
+        onClose={() => setShowDetails(false)}
         onNominate={() => {
           nominationsDispatch({
             type: NominationActionTypes.ADD,
@@ -145,7 +139,11 @@ const IndexPage = () => {
         }}
         query={searchState.query}
       />
-      <AnimatedElement height="35px" visible={!isOk(searchResults)}>
+      <AnimatedElement
+        height="35px"
+        visible={!isOk(searchResults)}
+        style={{ zIndex: 0 }}
+      >
         <NormalText>
           {!isOk(searchResults) ? searchResults : prevErr}
         </NormalText>
@@ -153,6 +151,7 @@ const IndexPage = () => {
       <AnimatedElement
         height="35px"
         visible={isOk(searchResults) && searchResults[0].length !== 0}
+        style={{ zIndex: 1 }}
       >
         <PageChanger
           onNextPage={() => {

@@ -1,9 +1,6 @@
 import { FullMovie, Movie, omdbId } from "lib/movieModel";
 import { Result } from "lib/result";
 
-// Polyfill for URLSearchParams
-import URLSearchParams from "@ungap/url-search-params";
-
 const API_KEY = "8c26a0ae";
 // Fetch url
 const BASE_URL = `//www.omdbapi.com/?apikey=${API_KEY}&v=1&`;
@@ -17,6 +14,11 @@ export const isEmpty = (item: string): boolean =>
 export const addAnd = (csvs: string | null): string | undefined =>
   csvs?.replace(/,([^,]*)$/, " and$1");
 
+const intoUrlFormat = (params: Record<string, string>) =>
+  Object.keys(params)
+    .map((key) => `${key}=${encodeURIComponent(params[key])}`)
+    .join("&");
+
 export const searchMovies = async (
   query: string,
   dateFilter?: string,
@@ -29,7 +31,7 @@ export const searchMovies = async (
     page: pageNumber.toString(),
     ...(dateFilter ? { dateFilter } : {}),
   };
-  const res = await fetch(BASE_URL + new URLSearchParams(params));
+  const res = await fetch(BASE_URL + intoUrlFormat(params));
 
   const json = await res.json();
   if (json.Response && json.Response !== "True") {
@@ -53,7 +55,7 @@ export const getFullMovie = async (movieId: omdbId): Promise<FullMovie> => {
     plot: "full",
     i: movieId,
   };
-  const res = await fetch(BASE_URL + new URLSearchParams(params));
+  const res = await fetch(BASE_URL + intoUrlFormat(params));
   const json = await res.json();
 
   const fullMovie = {
