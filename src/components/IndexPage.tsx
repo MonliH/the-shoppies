@@ -138,6 +138,13 @@ const IndexPage = () => {
           searchDispatch({ type: SearchActionTypes.SET_QUERY, query: q });
         }}
         query={searchState.query}
+        setDateQuery={(q: string) => {
+          searchDispatch({
+            type: SearchActionTypes.SET_DATE_FILTER,
+            dateFilter: q,
+          });
+        }}
+        date={searchState.dateFilter}
       />
       <AnimatedElement
         height="35px"

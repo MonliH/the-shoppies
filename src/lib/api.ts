@@ -19,6 +19,15 @@ const intoUrlFormat = (params: Record<string, string>) =>
     .map((key) => `${key}=${encodeURIComponent(params[key])}`)
     .join("&");
 
+const modifyError = (err: string) => {
+  switch (err) {
+    case "Movie not found!":
+      return "No movies found!";
+    default:
+      return err;
+  }
+};
+
 export const searchMovies = async (
   query: string,
   dateFilter?: string,
@@ -29,13 +38,13 @@ export const searchMovies = async (
     s: query.trim(),
     type: "movie",
     page: pageNumber.toString(),
-    ...(dateFilter ? { dateFilter } : {}),
+    ...(dateFilter ? { y: dateFilter } : {}),
   };
   const res = await fetch(BASE_URL + intoUrlFormat(params));
 
   const json = await res.json();
   if (json.Response && json.Response !== "True") {
-    return json.Error as string;
+    return modifyError(json.Error as string);
   }
 
   return [

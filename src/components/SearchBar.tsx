@@ -11,7 +11,7 @@ const SearchBarInput = styled.input`
   max-width: 700px;
   /* Make it look good on mobile */
   @media (max-width: 550px) {
-    width: 80vw;
+    width: 60vw;
   }
 
   font: 15px ${fontSans};
@@ -28,6 +28,15 @@ const SearchBarInput = styled.input`
     outline: 0;
     /* Fake the outline, becuase outline can't provide rounded corners */
     box-shadow: 0 0 0 1px #3d73ff;
+  }
+`;
+
+const DateInput = styled(SearchBarInput)`
+  width: 125px;
+  padding-left: 0;
+  padding: 9px;
+  @media (max-width: 550px) {
+    width: 20vw;
   }
 `;
 
@@ -64,12 +73,20 @@ const SearchHorizontalWrapper = styled(HorizontalWrapper)`
   position: relative;
 `;
 
+const FilterMargin = styled.span`
+  margin-left: 10px;
+`;
+
 const SearchBar = ({
   setQuery,
   query,
+  setDateQuery,
+  date,
 }: {
   setQuery: (query: string) => void;
   query: string;
+  setDateQuery: (query: string) => void;
+  date: string;
 }) => {
   const searchBarRef = useRef<HTMLInputElement>(null);
 
@@ -83,18 +100,32 @@ const SearchBar = ({
   return (
     <StyledPadding onMouseEnter={onMouseEnter}>
       <form onSubmit={(e) => e.preventDefault()}>
-        <Label htmlFor="searchbar">Search for a Movie</Label>
-        <SearchHorizontalWrapper>
-          <SearchIcon />
-          <SearchBarInput
-            type="search"
-            id="searchbar"
-            ref={searchBarRef}
-            placeholder="e.g. the matrix"
-            onChange={(e) => setQuery(e.target.value)}
-            value={query}
-          />
-        </SearchHorizontalWrapper>
+        <HorizontalWrapper>
+          <span>
+            <Label htmlFor="searchbar">Search for a Movie</Label>
+            <SearchHorizontalWrapper>
+              <SearchIcon />
+              <SearchBarInput
+                type="search"
+                id="searchbar"
+                ref={searchBarRef}
+                placeholder="e.g. the matrix"
+                onChange={(e) => setQuery(e.target.value)}
+                value={query}
+              />
+            </SearchHorizontalWrapper>
+          </span>
+          <FilterMargin>
+            <Label htmlFor="datefilter">Filter by Year</Label>
+            <DateInput
+              type="text"
+              id="datefilter"
+              placeholder="e.g. 1997"
+              onChange={(e) => setDateQuery(e.target.value)}
+              value={date}
+            />
+          </FilterMargin>
+        </HorizontalWrapper>
       </form>
     </StyledPadding>
   );

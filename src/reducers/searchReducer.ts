@@ -35,8 +35,18 @@ const nominationReducer = (
   switch (action.type) {
     case SearchActionTypes.SET_QUERY:
       return { ...state, query: action.query, pageNumber: 1 };
-    case SearchActionTypes.SET_DATE_FILTER:
-      return { ...state, dateFilter: action.dateFilter };
+    case SearchActionTypes.SET_DATE_FILTER: {
+      const lastChar = action.dateFilter[action.dateFilter.length - 1];
+      const isNumber = lastChar && lastChar >= "0" && lastChar <= "9";
+      return {
+        ...state,
+        // If not a number, keep the date filter the same
+        dateFilter:
+          isNumber || !action.dateFilter.length
+            ? action.dateFilter
+            : state.dateFilter,
+      };
+    }
     case SearchActionTypes.SET_LOADING:
       return { ...state, loading: action.loading };
     case SearchActionTypes.NEXT_PAGE:
