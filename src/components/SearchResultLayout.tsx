@@ -1,5 +1,7 @@
-import React, { useEffect, Dispatch } from "react";
+import React, { useState, useEffect, Dispatch } from "react";
 import styled from "styled-components";
+import { Layers } from "react-feather";
+
 import { animated, useSpring, config } from "react-spring";
 import { useDrag } from "react-use-gesture";
 
@@ -37,11 +39,13 @@ const OpenNominations = styled(animated.button)`
   margin-right: 15px;
   margin-bottom: 15px;
 
-  width: 100px;
-  height: 40px;
+  padding: 10px;
 
   border-radius: 3px;
-  box-shadow: 2px 2px 5px 1px #f2f2f2;
+  font-weight: bold;
+
+  align-items: center;
+  justify-content: center;
 `;
 
 const menuSwipeWidth = 716;
@@ -60,8 +64,8 @@ const SearchResultLayout = ({
   const { width: windowWidth } = useWindowDimensions(10);
 
   const width = getWidth(1);
-  const closedPosition = windowWidth;
-  const openPosition = windowWidth - width - 10;
+  const closedPosition = width;
+  const openPosition = 0;
   const smallScreen = windowWidth < menuSwipeWidth;
   const [{ x }, set] = useSpring(() => ({ x: closedPosition }));
 
@@ -84,7 +88,7 @@ const SearchResultLayout = ({
   const bind = useDrag(
     ({ vxvy: [vx], movement: [mx], cancel, canceled, last }) => {
       if (smallScreen) {
-        if (mx < -50) {
+        if (mx < windowWidth * -0.07) {
           cancel();
         }
 
@@ -130,13 +134,22 @@ const SearchResultLayout = ({
 
   const shouldShowOpacity = smallScreen ? 1 : 0;
 
-  const { opacity: buttonOpacity } = useSpring({
+  const [buttonHover, setButtonHover] = useState<boolean>(false);
+
+  const { opacity: buttonOpacity, shadow: buttonShadow } = useSpring({
     opacity: nominations.modifiedOrder.length ? shouldShowOpacity : 0,
+    shadow: buttonHover ? 5 : 3,
   });
 
   const buttonStyle = {
     opacity: buttonOpacity,
-    display: buttonOpacity.to((opacity) => (opacity === 0 ? "none" : "block")),
+    display: buttonOpacity.to((opacity) => (opacity === 0 ? "none" : "flex")),
+    boxShadow: buttonShadow.to(
+      (shadow) =>
+        `${shadow}px ${shadow}px ${shadow * 1.8}px ${shadow}px hsl(0deg, 0%, ${
+          100 - shadow * 2
+        }%)`
+    ),
   };
 
   return (
@@ -160,7 +173,13 @@ const SearchResultLayout = ({
                 position: "fixed",
                 top: 0,
                 left: 0,
-                transform: x.to((xPos) => `translate3d(${xPos}px, 0, 0)`),
+                transform: x
+                  .to(
+                    [openPosition, closedPosition],
+                    [windowWidth - width - 10, windowWidth],
+                    "extend"
+                  )
+                  .to((xPos) => `translate3d(${xPos}px, 0, 0)`),
               }
             : { position: "relative" }
         }
@@ -178,7 +197,13 @@ const SearchResultLayout = ({
           customStyle={boxShadow as any}
         />
       </FrontDiv>
-      <OpenNominations style={buttonStyle as any} onClick={() => open(false)}>
+      <OpenNominations
+        style={buttonStyle as any}
+        onClick={() => open(false)}
+        onMouseEnter={() => setButtonHover(true)}
+        onMouseLeave={() => setButtonHover(false)}
+      >
+        <Layers width={24} height={24} style={{ marginRight: 7 }} />
         Nominations
       </OpenNominations>
     </HorizontalWrapper>
