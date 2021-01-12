@@ -2,7 +2,7 @@
 
 <br />
 
-This Github repository contains the challege for the Shopify summer internship
+This Github repository contains the challenge for the Shopify summer internship
 application.
 
 For this project, I had **three** main goals:
@@ -27,16 +27,37 @@ For this project, I had **three** main goals:
 
 ### Features & Demos
 
-<sup>Drag and drop list to rank nominations:
+**Mobile support**:
 
-Items **save on reload**:
-
-**Pagination**:
+![Mobile](./assets/mobile.gif)
 
 More info on a movie, **directly in the app**:
 
-**Mobile support**:
+![MoreInfo](./assets/infoPopup.gif)
+
+Search with debouncing:
+
+![Search](./assets/search.gif)
+
+Drag and drop list to rank nominations:
+
+![List](./assets/draggableList.gif)
 
 Filter by year:
 
-Behind the scenes, there's also **debouncing** of the search results.
+![FilterByYear](./assets/filterByYear.gif)
+
+Items **save on reload**:
+
+![SaveSelections](./assets/saveSelections.gif)
+
+**Pagination**:
+
+![Pagination](./assets/pagination.gif)
+
+Good diagnostics:
+
+![Errors](./assets/goodErrors.gif)
+
+The site also scores a 100 on each category with [**lighthouse**](https://developers.google.com/web/tools/lighthouse):
+![Lighthouse Tests](./assets/lighthouse.png)
