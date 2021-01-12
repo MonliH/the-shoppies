@@ -22,8 +22,10 @@ import {
   NominationsState,
 } from "reducers/nominationReducer";
 
+const menuSwipeWidth = 716;
+
 const FrontDiv = styled(animated.div)`
-  z-index: 20;
+  z-index: 22;
   user-select: none;
   touch-action: pan-y;
 `;
@@ -49,8 +51,6 @@ const OpenNominations = styled(animated.button)`
   align-items: center;
   justify-content: center;
 `;
-
-const menuSwipeWidth = 716;
 
 const SearchResultLayout = ({
   nominations,
@@ -116,7 +116,7 @@ const SearchResultLayout = ({
   const backgroundStyle = {
     opacity: x.to([openPosition, closedPosition], [1, 0], "clamp"),
     display: x.to((xPos) => (xPos === closedPosition ? "none" : "block")),
-    zIndex: 20,
+    zIndex: 21,
   };
 
   useEffect(() => {
@@ -166,40 +166,58 @@ const SearchResultLayout = ({
         nominated={nominations.nominations}
         nominatedDisabled={nominations.nominatedDisabled}
       />
-      <Background style={backgroundStyle as any} onClick={() => close()} />
-      <FrontDiv
-        // eslint-disable-next-line react/jsx-props-no-spreading
-        {...bind()}
+      <animated.div
         style={
           smallScreen
-            ? {
+            ? ({
                 position: "fixed",
                 top: 0,
                 left: 0,
-                transform: x
-                  .to(
-                    [openPosition, closedPosition],
-                    [windowWidth - width - 10, windowWidth],
-                    "extend"
-                  )
-                  .to((xPos) => `translate3d(${xPos}px, 0, 0)`),
-              }
-            : { position: "relative" }
+                overflowY: "scroll",
+                overflowX: "hidden",
+                width: "100vw",
+                height: "100vh",
+                zIndex: 20,
+                display: backgroundStyle.display,
+              } as any)
+            : {}
         }
       >
-        <Nominations
-          movieOnInfo={displayMovieInfo}
-          removeOnClick={({ id }) => {
-            nominationsDispatch({
-              type: NominationActionTypes.REMOVE,
-              movieId: id,
-            });
-          }}
-          modifiedOrder={nominations.modifiedOrder}
-          nominations={nominations.nominations}
-          customStyle={boxShadow as any}
-        />
-      </FrontDiv>
+        <Background style={backgroundStyle as any} onClick={() => close()} />
+        <FrontDiv
+          // eslint-disable-next-line react/jsx-props-no-spreading
+          {...bind()}
+          style={
+            smallScreen
+              ? {
+                  position: "absolute",
+                  top: 0,
+                  left: 0,
+                  transform: x
+                    .to(
+                      [openPosition, closedPosition],
+                      [windowWidth - width - 10, windowWidth],
+                      "extend"
+                    )
+                    .to((xPos) => `translate3d(${xPos}px, 0, 0)`),
+                }
+              : { position: "relative" }
+          }
+        >
+          <Nominations
+            movieOnInfo={displayMovieInfo}
+            removeOnClick={({ id }) => {
+              nominationsDispatch({
+                type: NominationActionTypes.REMOVE,
+                movieId: id,
+              });
+            }}
+            modifiedOrder={nominations.modifiedOrder}
+            nominations={nominations.nominations}
+            customStyle={boxShadow as any}
+          />
+        </FrontDiv>
+      </animated.div>
       <OpenNominations
         style={buttonStyle as any}
         onClick={() => open(false)}
