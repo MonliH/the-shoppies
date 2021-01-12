@@ -1,4 +1,7 @@
-## 🏆 The Shoppies
+<div align=center>
+  <img alt="Logo" src="./public/logo192.png" width="80" height="80" />
+  <h2>The Shoppies</h2>
+</div>
 
 <br />
 

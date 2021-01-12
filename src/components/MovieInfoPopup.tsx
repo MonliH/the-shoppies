@@ -99,6 +99,7 @@ const MovieInfoImage = styled(MovieImage)`
 const MovieFactDiv = styled.div`
   display: flex;
   flex-direction: row;
+  flex-shrink: 0;
   height: fit-content;
   margin-bottom: 10px;
 `;
