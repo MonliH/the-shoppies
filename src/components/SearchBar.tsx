@@ -8,7 +8,7 @@ import { HorizontalWrapper } from "components/Wrappers";
 const SearchBarInput = styled.input`
   width: 60vw;
   /* We don't want it to be too long */
-  max-width: 700px;
+  max-width: 550px;
   /* Make it look good on mobile */
   @media (max-width: 550px) {
     width: 60vw;
@@ -37,6 +37,7 @@ const DateInput = styled(SearchBarInput)`
   padding: 9px;
   @media (max-width: 550px) {
     width: 20vw;
+    min-width: 100px;
   }
 `;
 

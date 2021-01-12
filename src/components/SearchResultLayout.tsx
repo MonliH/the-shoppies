@@ -9,6 +9,7 @@ import { HorizontalWrapper } from "components/Wrappers";
 import MovieResults from "components/MovieResults";
 import Nominations, { getWidth } from "components/Nominations";
 import { Background } from "components/MovieInfoPopup";
+import { fontSans } from "components/Text";
 
 import { Result, isOk } from "lib/result";
 import { Movie } from "lib/movieModel";
@@ -29,7 +30,8 @@ const FrontDiv = styled(animated.div)`
 
 const OpenNominations = styled(animated.button)`
   border: none;
-  background-color: ${(props) => props.theme.backgroundOne};
+  background-color: #2979ff;
+  color: white;
 
   z-index: 19;
   position: fixed;
@@ -42,7 +44,7 @@ const OpenNominations = styled(animated.button)`
   padding: 10px;
 
   border-radius: 3px;
-  font-weight: bold;
+  font: bold 15px ${fontSans};
 
   align-items: center;
   justify-content: center;
@@ -107,6 +109,7 @@ const SearchResultLayout = ({
       initial: () => [x.get(), 0],
       bounds: { left: openPosition, right: width },
       rubberband: true,
+      axis: "x",
     }
   );
 

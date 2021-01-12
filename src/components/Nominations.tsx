@@ -34,10 +34,6 @@ interface NominationsProps extends NominationsCardsProps {
   customStyle?: AnimatedProps<HTMLDivElement>["style"];
 }
 
-const HelpText = styled(NormalText)`
-  font-size: 14px;
-`;
-
 const SelectionsWrapper = styled.div`
   position: relative;
   /* Disable selecting because dragging causes it to be buggy */
@@ -187,7 +183,6 @@ const NominationsCards = ({
 
   const bindGesture = useDrag(
     (props) => {
-      props.event.stopPropagation();
       const getNewModifiedOrder = (modifiedOrd: ModifiedOrder) => {
         const {
           args,
@@ -227,7 +222,7 @@ const NominationsCards = ({
         getNewModifiedOrder(previousOrder);
       }
     },
-    { filterTaps: true, eventOptions: { capture: true } }
+    { filterTaps: true, axis: "y" }
   );
 
   return (
@@ -326,6 +321,16 @@ export const getWidth = (length: number) => {
   return (length ? cardDimensions.width : 0) + (length ? 40 : 0); // Add 40px of marign
 };
 
+const BigLabel = styled(Label)`
+  font-size: 17px;
+`;
+
+const HelpText = styled(NormalText)`
+  font-size: 14px;
+  padding-right: 30px;
+  line-height: 1.4;
+`;
+
 const Nominations = ({
   removeOnClick,
   nominations,
@@ -337,7 +342,7 @@ const Nominations = ({
   const style = useSpring({
     opacity: modifiedOrder.length ? 1 : 0,
     height:
-      modifiedOrder.length * totalHeight + (modifiedOrder.length ? 90 : 0),
+      modifiedOrder.length * totalHeight + (modifiedOrder.length ? 115 : 0),
     width: getWidth(modifiedOrder.length),
   });
 
@@ -347,8 +352,8 @@ const Nominations = ({
         { ...customStyle, ...style } as any // Again, a bug in react spring: https://github.com/react-spring/react-spring/issues/1102
       }
     >
-      <Label>Nominated Movies</Label>
-      <HelpText>Drag Movies to Rearrange</HelpText>
+      <BigLabel>Nominated Movies</BigLabel>
+      <HelpText>Drag Movies to Rearrange. Your order will be saved.</HelpText>
       <NominationsCards
         removeOnClick={removeOnClick}
         nominations={nominations}
