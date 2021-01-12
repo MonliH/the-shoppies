@@ -1,4 +1,4 @@
-## The Shoppies
+## 🏆 The Shoppies
 
 <br />
 
@@ -27,7 +27,7 @@ For this project, I had **three** main goals:
 
 ### Features & Demos
 
-Drag and drop list to rank nominations:
+<sup>Drag and drop list to rank nominations:
 
 Items **save on reload**:
 

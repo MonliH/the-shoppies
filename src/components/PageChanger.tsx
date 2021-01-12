@@ -39,13 +39,21 @@ const PageChanger = ({
 
   return (
     <PageChangerWrapper>
-      <PaginationButton onClick={onPreviousPage} disabled={!hasPreviousPage}>
+      <PaginationButton
+        onClick={onPreviousPage}
+        disabled={!hasPreviousPage}
+        aria-label="Previous Page"
+      >
         <ArrowLeft />
       </PaginationButton>
       <NormalTextSmall>
         Page <b>{currentPage}</b> of <b>{savedPageNumber.current}</b>
       </NormalTextSmall>
-      <PaginationButton onClick={onNextPage} disabled={!hasNextPage}>
+      <PaginationButton
+        onClick={onNextPage}
+        disabled={!hasNextPage}
+        aria-label="Next Page"
+      >
         <ArrowRight />
       </PaginationButton>
     </PageChangerWrapper>

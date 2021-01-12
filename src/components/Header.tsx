@@ -53,6 +53,8 @@ const Header = () => {
           onLoad={() => setAlt(false)}
           style={{ display: alt ? "none" : "block" }}
           src="/logo192.png"
+          width="62"
+          height="62"
         />
         <LargeHeading>The Shoppies</LargeHeading>
       </HeadingHorizontalWrapper>
