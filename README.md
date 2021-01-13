@@ -1,6 +1,7 @@
 <div align=center>
   <img alt="Logo" src="./public/logo192.png" width="80" height="80" />
   <h2>The Shoppies</h2>
+  <h4><a href="https://the-shoppies-award.netlify.app/">Live at <b>the-shoppies-award.netlify.app</b></a></h4>
 </div>
 
 <br />
