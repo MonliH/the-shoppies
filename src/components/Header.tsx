@@ -59,7 +59,7 @@ const Header = () => {
         <LargeHeading>The Shoppies</LargeHeading>
       </HeadingHorizontalWrapper>
       <HeadingNormalText>
-        Nominate your top 5 movies for the Shopies award!
+        Nominate your top 5 movies for the Shoppies award!
       </HeadingNormalText>
     </div>
   );
