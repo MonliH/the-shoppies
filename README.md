@@ -31,6 +31,32 @@ For this project, I had **three** main goals:
 
 <br />
 
+### Running Locally
+
+First, clone the repo and `cd` into it. Run `npm i` or `yarn` to install dependencies. Then:
+
+Run tests:
+
+```bash
+npm run test
+```
+
+Start developement server:
+
+```bash
+npm run start
+```
+
+<br />
+
+### Lighthouse
+
+The site scores a 100 on each category with [**lighthouse**](https://developers.google.com/web/tools/lighthouse), an automated tool to improve the quality of web pages:
+
+![Lighthouse Tests](./assets/lighthouse.png)
+
+<br />
+
 ### Features & Demos
 
 **Mobile support, Gesture Based**:
@@ -64,6 +90,3 @@ Items **save on reload**:
 Good diagnostics:
 
 ![Errors](./assets/goodErrors.gif)
-
-The site also scores a 100 on each category with [**lighthouse**](https://developers.google.com/web/tools/lighthouse):
-![Lighthouse Tests](./assets/lighthouse.png)

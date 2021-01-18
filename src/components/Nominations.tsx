@@ -17,7 +17,7 @@ import MovieCard, {
   cardDimensions,
   MovieInteraction,
 } from "components/MovieCard";
-import { Button, AnimatedStyledPadding, RemoveButton } from "components/Widget";
+import { Button, AnimatedPaper, RemoveButton } from "components/Widget";
 import { Label, NormalText } from "components/Text";
 
 export type NominationsStore = Record<string, Movie>;
@@ -222,7 +222,22 @@ const NominationsCards = ({
         getNewModifiedOrder(previousOrder);
       }
     },
-    { filterTaps: true, axis: "y" }
+    {
+      filterTaps: true,
+      axis: "y",
+      rubberband: true,
+      bounds: ({ args: [_, offset] }) => {
+        return offset
+          ? {
+              top: -offset.get() - 20,
+              bottom:
+                (previousOrder.length - 1) *
+                  (cardDimensions.height + cardDimensions.TBMargin) -
+                offset.get(),
+            }
+          : {};
+      },
+    }
   );
 
   return (
@@ -269,7 +284,7 @@ const NominationsCards = ({
               paddingRight: "25px", // This is to give space to the delete button
             }}
             otherProps={{
-              ...bindGesture(newIdx),
+              ...bindGesture(newIdx, springs[newIdx]?.y),
               style: {
                 top: 0,
                 left: 0,
@@ -310,7 +325,7 @@ const NominationsCards = ({
   );
 };
 
-const NominationsDiv = styled(AnimatedStyledPadding)`
+const NominationsDiv = styled(AnimatedPaper)`
   background-color: #f0f0f0;
   width: 0px;
   z-index: 5;

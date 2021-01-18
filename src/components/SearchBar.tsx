@@ -1,7 +1,7 @@
 import styled from "styled-components";
 import React, { useRef } from "react";
 
-import { StyledPadding } from "components/Widget";
+import { Paper } from "components/Widget";
 import { Label, fontSans } from "components/Text";
 import { HorizontalWrapper } from "components/Wrappers";
 
@@ -99,7 +99,7 @@ const SearchBar = ({
   };
 
   return (
-    <StyledPadding onMouseEnter={onMouseEnter}>
+    <Paper onMouseEnter={onMouseEnter}>
       <form onSubmit={(e) => e.preventDefault()}>
         <HorizontalWrapper>
           <span>
@@ -129,7 +129,7 @@ const SearchBar = ({
           </FilterMargin>
         </HorizontalWrapper>
       </form>
-    </StyledPadding>
+    </Paper>
   );
 };
 

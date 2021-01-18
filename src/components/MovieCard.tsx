@@ -5,7 +5,7 @@ import { CameraOff } from "react-feather";
 
 import { VerticalWrapper, HorizontalWrapper } from "components/Wrappers";
 import { SmallHeading, NormalText } from "components/Text";
-import { AnimatedStyledPadding } from "components/Widget";
+import { AnimatedPaper } from "components/Widget";
 
 import { Movie } from "lib/movieModel";
 import Without from "lib/without";
@@ -34,7 +34,7 @@ const MovieFallback = styled(MovieImg).attrs({ as: "div" })`
   background-color: #efefef;
 `;
 
-const MoviePadding = styled(AnimatedStyledPadding)`
+const MoviePadding = styled(AnimatedPaper)`
   width: ${cardDimensions.width}px;
   height: ${cardDimensions.height}px;
   padding: 15px !important;

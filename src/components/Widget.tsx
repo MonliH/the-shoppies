@@ -13,13 +13,13 @@ const shared = `
   margin-bottom: 15px;
 `;
 
-export const StyledPadding = styled.div`
+export const Paper = styled.div`
   ${shared}
   background-color: ${(props) => props.theme.backgroundOne};
 `;
 
 // For use with react spring
-export const AnimatedStyledPadding = styled(animated.div)`
+export const AnimatedPaper = styled(animated.div)`
   ${shared}
   background-color: ${(props) => props.theme.backgroundOne};
 `;
