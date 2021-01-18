@@ -289,6 +289,7 @@ const NominationsCards = ({
               onClick={() => {
                 movieOnInfo(movie);
               }}
+              data-testid={`more-info-${movie.id}`}
             >
               More Info
             </Button>
@@ -298,6 +299,7 @@ const NominationsCards = ({
               }}
               marginTop={7}
               marginRight={7}
+              data-testid={`remove-button-${movie.id}`}
             >
               <X size={20} />
             </RemoveButton>

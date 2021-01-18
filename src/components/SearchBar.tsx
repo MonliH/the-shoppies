@@ -109,6 +109,7 @@ const SearchBar = ({
               <SearchBarInput
                 type="search"
                 id="searchbar"
+                data-testid="searchbar"
                 ref={searchBarRef}
                 placeholder="e.g. the matrix"
                 onChange={(e) => setQuery(e.target.value)}

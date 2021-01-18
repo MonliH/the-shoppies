@@ -266,7 +266,12 @@ const MovieInfoPopup = ({
           } as any
         }
       >
-        <InfoClose onClick={onClose} marginTop={0} marginRight={0}>
+        <InfoClose
+          onClick={onClose}
+          marginTop={0}
+          marginRight={0}
+          data-testid="close-modal"
+        >
           <FeatherIcons.X size={23} color={largeLayout ? "black" : "white"} />
         </InfoClose>
         <Popup>

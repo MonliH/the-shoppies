@@ -43,6 +43,7 @@ const PageChanger = ({
         onClick={onPreviousPage}
         disabled={!hasPreviousPage}
         aria-label="Previous Page"
+        data-testid="previous-page"
       >
         <ArrowLeft />
       </PaginationButton>
@@ -53,6 +54,7 @@ const PageChanger = ({
         onClick={onNextPage}
         disabled={!hasNextPage}
         aria-label="Next Page"
+        data-testid="next-page"
       >
         <ArrowRight />
       </PaginationButton>

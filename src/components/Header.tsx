@@ -49,6 +49,7 @@ const Header = () => {
         )}
         <HeadingLogo
           alt="Logo"
+          id="logo"
           onError={() => setAlt(true)}
           onLoad={() => setAlt(false)}
           style={{ display: alt ? "none" : "block" }}

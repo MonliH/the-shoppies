@@ -2,6 +2,7 @@ module.exports = {
   env: {
     browser: true,
     es2021: true,
+    jest: true,
   },
   extends: [
     "airbnb",
@@ -34,10 +35,17 @@ module.exports = {
       "error",
       { argsIgnorePattern: "^_$" },
     ],
+    "import/extensions": "off",
 
     "react/require-default-props": "off",
     "react/jsx-filename-extension": ["error", { extensions: [".jsx", ".tsx"] }],
     "react-hooks/exhaustive-deps": "off",
+    "import/no-extraneous-dependencies": [
+      "error",
+      {
+        devDependencies: ["**/*.test.ts", "**/*.test.tsx", "src/setupTests.ts"],
+      },
+    ],
 
     quotes: ["error", "double", { avoidEscape: true }],
     "comma-dangle": [
