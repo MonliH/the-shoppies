@@ -3,7 +3,7 @@ import userEvent from "@testing-library/user-event";
 import { render, screen } from "@testing-library/react";
 import { Button } from "components/Widget";
 
-describe("Button", () => {
+describe("Component: Button", () => {
   it("should display children", () => {
     render(<Button>Test</Button>);
 

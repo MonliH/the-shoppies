@@ -1,6 +1,4 @@
-const theme = {
+export default {
   backgroundOne: "#FFFFFF",
   backgroundTwo: "#FCFCFC",
 };
-
-export default theme;

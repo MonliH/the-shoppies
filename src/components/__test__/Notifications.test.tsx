@@ -2,7 +2,7 @@ import React from "react";
 import { render, screen } from "@testing-library/react";
 import Notifications from "components/Notifications";
 
-describe("Notfications", () => {
+describe("Component: Notfications", () => {
   it("should show notifications", () => {
     render(
       <Notifications

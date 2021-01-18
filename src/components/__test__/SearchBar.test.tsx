@@ -3,7 +3,7 @@ import userEvent from "@testing-library/user-event";
 import { render, screen } from "@testing-library/react";
 import SearchBar from "components/SearchBar";
 
-describe("SearchBar", () => {
+describe("Component: SearchBar", () => {
   it("should focus on hover", () => {
     render(
       <SearchBar

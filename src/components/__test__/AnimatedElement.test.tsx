@@ -2,7 +2,7 @@ import React from "react";
 import { render, screen } from "@testing-library/react";
 import AnimatedElement from "components/AnimatedElement";
 
-describe("AnimatedElement", () => {
+describe("Component: AnimatedElement", () => {
   it("should have the text", () => {
     const testString = "this is a test string aIOawi92";
     render(

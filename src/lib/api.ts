@@ -14,12 +14,14 @@ export const isEmpty = (item: string): boolean =>
 export const addAnd = (csvs: string | null): string | undefined =>
   csvs?.replace(/,([^,]*)$/, " and$1");
 
-const intoUrlFormat = (params: Record<string, string>) =>
+export const intoUrlFormat = (params: Record<string, string>) =>
   Object.keys(params)
-    .map((key) => `${key}=${encodeURIComponent(params[key])}`)
+    .map(
+      (key) => `${encodeURIComponent(key)}=${encodeURIComponent(params[key])}`
+    )
     .join("&");
 
-const modifyError = (err: string) => {
+export const modifyError = (err: string) => {
   switch (err) {
     case "Movie not found!":
       return "No movies found!";

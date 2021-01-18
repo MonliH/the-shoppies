@@ -27,7 +27,7 @@ const sharedProps = {
   },
 };
 
-describe("Nominations", () => {
+describe("Component: Nominations", () => {
   it("be able to remove elements", (done) => {
     render(
       <Nominations

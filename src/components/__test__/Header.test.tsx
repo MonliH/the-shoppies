@@ -2,7 +2,7 @@ import React from "react";
 import { render, screen } from "@testing-library/react";
 import Header from "components/Header";
 
-describe("Header", () => {
+describe("Component: Header", () => {
   it("should display basic info", () => {
     render(<Header />);
     const shoppies = screen.getAllByText(/the shoppies/i);

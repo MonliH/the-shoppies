@@ -26,7 +26,7 @@ const info = {
   title: "Beta Test",
 };
 
-describe("MovieInfoPopup", () => {
+describe("Component: MovieInfoPopup", () => {
   it("should run onClose on close", (done) => {
     render(
       <MovieInfoPopup

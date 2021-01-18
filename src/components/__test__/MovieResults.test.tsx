@@ -11,7 +11,7 @@ const theMatrix = {
   title: "The Matrix",
 };
 
-describe("MovieResult", () => {
+describe("Component: MovieResult", () => {
   it("should be able to activate popup", (done) => {
     render(
       <MovieResults

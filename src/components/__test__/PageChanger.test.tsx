@@ -3,7 +3,7 @@ import userEvent from "@testing-library/user-event";
 import { render, screen } from "@testing-library/react";
 import PageChanger from "components/PageChanger";
 
-describe("PageChanger", () => {
+describe("Component: PageChanger", () => {
   it("should call nextPage", (done) => {
     render(
       <PageChanger

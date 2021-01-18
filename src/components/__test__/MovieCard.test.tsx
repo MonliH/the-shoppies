@@ -12,7 +12,7 @@ const theMatrix = {
   title: "The Matrix",
 };
 
-describe("MovieCard", () => {
+describe("Component: MovieCard", () => {
   it("should have image if url valid", () => {
     render(<MovieCard movie={theMatrix} />);
     const image = screen.getByAltText(/movie poster/i);
