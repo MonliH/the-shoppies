@@ -1,6 +1,8 @@
 <div align=center>
   <img alt="Logo" src="./public/logo192.png" width="80" height="80" />
   <h2>The Shoppies</h2>
+  <a href="https://github.com/MonliH/the-shoppies/actions"><img alt="GitHub Workflow Status" src="https://img.shields.io/github/workflow/status/MonliH/the-shoppies/Node.js%20CI?style=flat-square"></a>
+  <img alt="Lines of code" src="https://img.shields.io/tokei/lines/github/MonliH/the-shoppies?style=flat-square">
   <h4><a href="https://the-shoppies-award.netlify.app/">Live at <b>the-shoppies-award.netlify.app</b></a></h4>
 </div>
 
