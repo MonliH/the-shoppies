@@ -31,7 +31,7 @@ For this project, I had **three** main goals:
 
 ### Features & Demos
 
-**Mobile support**:
+**Mobile support, Gesture Based**:
 
 ![Mobile](./assets/mobile.gif)
 
